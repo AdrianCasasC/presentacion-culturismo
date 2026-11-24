@@ -1,0 +1,1682 @@
+<meta charset="utf-8">
+<title>Sobre la tarima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Big+Shoulders+Display:wght@600;800;900&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Concepto: la tarima de competición. Fondo de escenario cálido, focos desde arriba,
+   bronce del tinte de competición y oro de trofeo como acentos; azul solo para agua/gasto.
+   Lienzo fijo 1920×1080 escalado a la ventana. Look oscuro único, elegido a propósito. */
+:root{
+  color-scheme: dark;
+  --stage:#120f0c;
+  --stage-2:#1d1814;
+  --stage-3:#2b231c;
+  --line:#3d332a;
+  --chalk:#f4ede3;
+  --muted:#a8998a;
+  --bronze:#d68b4c;
+  --gold:#f2c561;
+  --water:#79aee0;
+  --muscle:#8c412c;
+  --muscle-hi:#b2603f;
+
+  --f-display:"Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+  --f-body:"Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"DM Mono", ui-monospace, Consolas, monospace;
+
+  --ease:cubic-bezier(.2,.75,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--stage);color:var(--chalk);font-family:var(--f-body);overflow:hidden}
+button{font:inherit;color:inherit}
+
+/* ---------- Escenario y escalado ---------- */
+.viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage)}
+.deck{position:absolute;left:50%;top:50%;width:1920px;height:1080px;
+  transform:translate(-50%,-50%) scale(var(--k,.5));transform-origin:center;overflow:hidden;
+  background:var(--stage)}
+
+.slide{position:absolute;inset:0;padding:110px 140px 130px;display:flex;flex-direction:column;gap:48px;
+  background:
+    radial-gradient(1100px 700px at 50% -10%, rgba(255,214,150,.10), transparent 70%),
+    var(--stage);
+  opacity:0;visibility:hidden;transform:translateX(70px);
+  transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s linear .9s}
+.slide.past{transform:translateX(-70px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s}
+.slide .notes{display:none}
+
+/* Entrada escalonada de elementos cada vez que la diapositiva se activa */
+@keyframes rise{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
+.slide.active .in{animation:rise .9s var(--ease) both;animation-delay:var(--d,0s)}
+
+/* Pasos (clic a clic) */
+[data-step]{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+[data-step].on{opacity:1;transform:none}
+
+/* ---------- Tipografía y piezas comunes ---------- */
+.eyebrow{font-family:var(--f-mono);font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--bronze);display:flex;gap:18px;align-items:center}
+.eyebrow::before{content:"";width:46px;height:2px;background:currentColor}
+h2{font-family:var(--f-display);font-weight:800;font-size:104px;line-height:.98;letter-spacing:.005em;text-transform:uppercase;text-wrap:balance;max-width:1500px}
+h3{font-family:var(--f-display);font-weight:800;font-size:46px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+p,li{font-size:32px;line-height:1.4}
+.muted{color:var(--muted)}
+.gold{color:var(--gold)}
+.bronze{color:var(--bronze)}
+.water-c{color:var(--water)}
+.mono{font-family:var(--f-mono)}
+.head{display:flex;flex-direction:column;gap:22px}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.lbl{font-family:var(--f-mono);font-size:22px;letter-spacing:.12em;text-transform:uppercase;color:var(--bronze)}
+.fill{flex:1;min-height:0}
+.src{position:absolute;left:140px;bottom:56px;font-family:var(--f-mono);font-size:20px;color:var(--muted);letter-spacing:.04em}
+.ph-note{font-family:var(--f-mono);color:var(--gold)}
+
+.card{background:var(--stage-2);border:2px solid var(--line);border-radius:22px;padding:34px 34px 38px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card p{font-size:28px;line-height:1.4;color:var(--muted)}
+.card .icon{width:64px;height:64px;color:var(--bronze);margin-bottom:6px}
+.icon *{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.statement{font-family:var(--f-display);font-weight:800;font-size:60px;line-height:1;text-transform:uppercase;color:var(--gold)}
+.analogy{font-size:32px;color:var(--chalk);border-left:4px solid var(--bronze);padding-left:26px}
+
+/* Lista sincronizada con los pasos */
+.steps{display:flex;flex-direction:column;gap:10px;list-style:none;min-width:0}
+.steps li{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:14px 24px;border-radius:18px;border:2px solid transparent;
+  opacity:.28;transition:opacity .5s,border-color .5s,background .5s}
+.steps li .n{font-family:var(--f-display);font-weight:900;font-size:60px;line-height:.9;color:var(--muted)}
+.steps li b{display:block;font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1.05;text-transform:uppercase;margin-bottom:4px}
+.steps li span{font-size:26px;line-height:1.35;color:var(--muted)}
+.steps li.done{opacity:.6}
+.steps li.now{opacity:1;border-color:var(--line);background:var(--stage-2)}
+.steps li.now .n{color:var(--bronze)}
+
+/* Huecos para fotos: si existe fotos/x.jpg se muestra; si no, queda el marcador */
+.ph{position:relative;border:2px dashed var(--line);border-radius:20px;overflow:hidden;
+  background:repeating-linear-gradient(135deg,var(--stage-2) 0 16px,#18130f 16px 32px);
+  display:grid;place-items:center;text-align:center;min-width:0}
+.ph figcaption{font-family:var(--f-mono);font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:20px;line-height:1.5}
+.ph figcaption b{display:block;color:var(--gold);font-weight:500}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+
+/* Línea temporal reutilizable */
+.tl{position:relative;display:grid;gap:36px;padding-top:86px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:30px;height:3px;background:var(--line)}
+.tl-bar{position:absolute;left:0;right:0;top:30px;height:3px;background:var(--bronze);transform:scaleX(var(--p,0));transform-origin:left;transition:transform 1s var(--ease)}
+.tl-item{position:relative;display:flex;flex-direction:column;gap:10px}
+.tl-item::before{content:"";position:absolute;left:0;top:-70px;width:26px;height:26px;border-radius:50%;background:var(--stage);border:4px solid var(--bronze)}
+.tl-item .y{font-family:var(--f-display);font-weight:900;font-size:84px;line-height:.9;color:var(--gold)}
+.tl-item b{font-family:var(--f-display);font-weight:800;font-size:40px;text-transform:uppercase;line-height:1.05}
+.tl-item p{font-size:27px;color:var(--muted);line-height:1.4}
+
+/* ---------- Portada ---------- */
+#portada,#cierre{justify-content:space-between;align-items:stretch;padding:90px 140px 100px;
+  background:radial-gradient(900px 260px at 50% 100%, rgba(214,139,76,.22), transparent 70%),var(--stage)}
+.beam{position:absolute;top:-260px;width:620px;height:1500px;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(255,226,176,.30), rgba(255,226,176,.06) 60%, transparent 85%);
+  clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);filter:blur(26px);transform-origin:50% 0;mix-blend-mode:screen}
+.beam.l{left:220px;--from:-34deg;--to:-14deg}
+.beam.r{right:220px;--from:34deg;--to:14deg}
+.beam.c{left:650px;width:620px;--from:0deg;--to:0deg;opacity:0}
+.slide.active .beam{animation:sweep 2.6s var(--ease) both, sway 9s ease-in-out 2.6s infinite alternate}
+.slide.active .beam.c{animation:spot 1.8s ease 1.4s both}
+@keyframes sweep{from{transform:rotate(var(--from));opacity:0}to{transform:rotate(var(--to));opacity:1}}
+@keyframes sway{from{transform:rotate(var(--to))}to{transform:rotate(calc(var(--to) * .55))}}
+@keyframes spot{0%{opacity:0}40%{opacity:.9}55%{opacity:.5}100%{opacity:.85}}
+
+.cover-top{display:flex;justify-content:space-between;align-items:center;position:relative}
+.cover-mid{display:flex;flex-direction:column;align-items:center;gap:28px;position:relative}
+.title{font-family:var(--f-display);font-weight:900;font-size:300px;line-height:.82;letter-spacing:.01em;display:flex}
+.title span{display:inline-block;
+  background:linear-gradient(100deg,#a65d2c 0%,#d68b4c 30%,#f2c561 46%,#fff4d8 50%,#f2c561 54%,#d68b4c 70%,#a65d2c 100%);
+  background-size:400% 100%;background-position:100% 0;
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.slide.active .title span{animation:letter 1.1s var(--ease) both, shine 7s ease-in-out infinite;
+  animation-delay:calc(.35s + var(--i) * .06s), calc(2.4s + var(--i) * .09s)}
+@keyframes letter{from{opacity:0;transform:translateY(120px) scaleY(1.25)}to{opacity:1;transform:none}}
+@keyframes shine{0%,55%{background-position:100% 0}100%{background-position:0 0}}
+.subtitle{font-size:40px;font-weight:500;color:var(--chalk);letter-spacing:.01em}
+.cover-bottom{display:flex;justify-content:space-between;align-items:flex-end;position:relative;gap:40px}
+.who{display:flex;flex-direction:column;gap:8px}
+.who b{font-family:var(--f-display);font-weight:800;font-size:54px;text-transform:uppercase;letter-spacing:.03em}
+.badges{display:flex;gap:16px}
+.badge{font-family:var(--f-mono);font-size:24px;padding:14px 22px;border:1.5px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(29,24,20,.7)}
+.badge.win{border-color:var(--gold);color:var(--gold)}
+.start-hint{font-family:var(--f-mono);font-size:22px;color:var(--muted);letter-spacing:.1em}
+#portada.active .start-hint{animation:blink 2.4s ease-in-out 3s infinite}
+@keyframes blink{50%{opacity:.35}}
+
+/* ---------- Pregunta del agua ---------- */
+#agua{gap:40px}
+#agua h2{font-size:88px;max-width:1640px}
+.options{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.opt{position:relative;display:flex;align-items:center;gap:28px;padding:30px 34px;border:2px solid var(--line);border-radius:22px;background:var(--stage-2);
+  transition:opacity .6s var(--ease),border-color .6s,background .6s,transform .6s var(--ease)}
+.opt .k{font-family:var(--f-display);font-weight:900;font-size:66px;line-height:1;color:var(--bronze);width:46px}
+.opt .v{font-family:var(--f-display);font-weight:800;font-size:58px;line-height:1;text-transform:uppercase}
+#agua.at-1 .opt:not(.correct){opacity:.28;transform:scale(.96)}
+#agua.at-1 .opt.correct{border-color:var(--gold);background:linear-gradient(160deg,rgba(242,197,97,.18),rgba(242,197,97,.04));transform:translateY(-8px)}
+#agua.at-1 .opt.correct .k{color:var(--gold)}
+.opt .tick{position:absolute;right:-18px;top:-18px;width:50px;height:50px;border-radius:50%;background:var(--gold);color:var(--stage);
+  display:grid;place-items:center;font-weight:700;font-size:30px;opacity:0;transform:scale(.3);transition:.5s var(--ease) .2s}
+#agua.at-1 .opt.correct .tick{opacity:1;transform:none}
+.water{display:grid;grid-template-columns:330px 1fr;align-items:center;gap:40px}
+.liters{font-family:var(--f-display);font-weight:900;font-size:220px;line-height:.85;color:var(--water);font-variant-numeric:tabular-nums}
+.liters small{font-size:90px;margin-left:8px}
+.bottles{display:flex;gap:26px;align-items:flex-end}
+.bottle{position:relative;width:76px;height:170px;border:3px solid rgba(121,174,224,.55);border-radius:22px 22px 18px 18px;overflow:hidden;background:rgba(121,174,224,.05)}
+.bottle i{position:absolute;inset:0;background:linear-gradient(to top,#3f78b3,var(--water));transform:scaleY(0);transform-origin:bottom;transition:transform .7s var(--ease);transition-delay:calc(var(--i) * .16s)}
+#agua.at-2 .bottle i{transform:none}
+.teaser{font-family:var(--f-display);font-weight:800;font-size:56px;text-transform:uppercase;color:var(--bronze)}
+
+/* ---------- Historia ---------- */
+#historia{gap:36px}
+#historia .tl{grid-template-columns:repeat(4,1fr)}
+#historia .tl-item p{font-size:25px;min-height:140px}
+#historia .tl-item b{min-height:84px}
+#historia{padding-bottom:150px}
+#historia .tl{grid-template-rows:minmax(0,1fr);padding-top:72px}
+#historia .tl::before,#historia .tl-bar{top:24px}
+#historia .tl-item::before{top:-61px}
+#historia .tl-item .y{font-size:68px}
+#historia .tl-item{min-height:0}
+.tl-img{position:relative;flex:1;min-height:0;margin-top:6px;border-radius:16px;overflow:hidden;background:#0d0b09;border:2px solid var(--line)}
+.tl-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;object-position:var(--pos,50% 25%);transform:scale(1.12);transition:transform 1.6s var(--ease)}
+.tl-item.on .tl-img img{transform:none}
+#historia.at-1 .tl-bar{--p:.13} #historia.at-2 .tl-bar{--p:.38} #historia.at-3 .tl-bar{--p:.63} #historia.at-4 .tl-bar{--p:1}
+
+/* ---------- Natural vs sustancias ---------- */
+.vs{display:grid;grid-template-columns:1fr 110px 1fr;gap:30px;align-items:center;flex:1;min-height:0}
+.vs .card{height:100%;justify-content:flex-start;gap:22px}
+.vs ul{list-style:none;display:flex;flex-direction:column;gap:18px}
+.vs li{font-size:30px;line-height:1.35;padding-left:34px;position:relative;color:var(--chalk)}
+.vs li::before{content:"";position:absolute;left:0;top:16px;width:14px;height:14px;border-radius:50%;background:var(--c,var(--bronze))}
+.vs .card.b{--c:var(--muted)}
+.vs-mid{width:110px;height:110px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:48px;color:var(--gold)}
+.vs .card .tag{font-family:var(--f-mono);font-size:22px;color:var(--muted);letter-spacing:.06em}
+#natural .vs{grid-template-rows:minmax(0,1fr)}
+#natural .vs .card{min-height:0;gap:18px;padding-bottom:30px}
+.vs-img{flex:1;min-height:0;border-radius:16px;overflow:hidden;border:2px solid var(--line);margin-top:4px}
+.vs-img img{width:100%;height:100%;object-fit:cover;display:block;object-position:var(--pos,50% 50%)}
+#natural .vs li{font-size:28px}
+
+/* ---------- Fibra muscular ---------- */
+#fibra{gap:40px}
+.two{display:grid;grid-template-columns:720px 1fr;gap:80px;align-items:center;flex:1;min-height:0}
+.fiber-svg{width:720px;height:auto;display:block;overflow:visible}
+.fiber{transform-box:fill-box;transform-origin:center;transition:transform 1.4s var(--ease)}
+#fibra.active:not(.at-1) .fiber{animation:flex 1.8s ease-in-out infinite}
+#fibra.active:not(.at-1) .fiber:nth-of-type(2n){animation-delay:.25s}
+@keyframes flex{50%{transform:scaleX(.965)}}
+#fibra.at-3 .fiber{transform:scaleY(1.3)}
+.crack{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;
+  filter:drop-shadow(0 0 8px rgba(242,197,97,.8));transition:stroke-dashoffset .9s var(--ease),opacity .8s}
+#fibra.at-1 .crack{stroke-dashoffset:0}
+#fibra.at-1 .crack:nth-of-type(2){transition-delay:.25s}
+#fibra.at-1 .crack:nth-of-type(3){transition-delay:.5s}
+#fibra.at-3 .crack{opacity:0}
+.cell{fill:var(--water);opacity:0;transform:translate(-90px,-70px);transition:transform 1.1s var(--ease),opacity .7s}
+#fibra.at-2 .cell{opacity:1;transform:none}
+#fibra.at-2 .cell:nth-of-type(2){transition-delay:.2s}
+#fibra.at-2 .cell:nth-of-type(3){transition-delay:.4s}
+#fibra.at-3 .cell{opacity:0}
+.grow{opacity:0;transition:opacity .6s .9s}
+#fibra.at-3 .grow{opacity:1}
+
+/* ---------- Sobrecarga ---------- */
+.over{display:grid;grid-template-columns:1000px 1fr;gap:80px;align-items:center;flex:1;min-height:0}
+.over svg{width:1000px;height:auto;overflow:visible}
+.over svg text{font-family:var(--f-mono)}
+.bar{transform-box:fill-box;transform-origin:bottom;fill:var(--bronze)}
+.bar:last-of-type{fill:var(--gold)}
+.slide.active .bar{animation:barUp .8s var(--ease) both;animation-delay:calc(.3s + var(--i) * .12s)}
+@keyframes barUp{from{transform:scaleY(0)}}
+.bar-lbl{opacity:0}
+.slide.active .bar-lbl{animation:fadeIn .5s both;animation-delay:calc(.8s + var(--i) * .12s)}
+@keyframes fadeIn{to{opacity:1}}
+.ways{display:flex;flex-direction:column;gap:22px}
+.ways div{display:flex;gap:22px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:18px}
+.ways b{font-family:var(--f-display);font-weight:900;font-size:56px;color:var(--gold);min-width:64px;line-height:1}
+.ways span{font-size:32px}
+
+/* ---------- Técnica ---------- */
+.tech .card{flex-direction:row;gap:30px;align-items:flex-start}
+.tech .card>div{display:flex;flex-direction:column;gap:12px;min-width:0}
+.tempo{position:relative;width:64px;height:150px;flex:0 0 64px;border-radius:32px;background:var(--stage-3)}
+.tempo i{position:absolute;left:12px;top:12px;width:40px;height:40px;border-radius:50%;background:var(--gold)}
+.slide.active .tempo i{animation:tempo 4s linear infinite}
+@keyframes tempo{0%{top:12px}75%{top:98px}100%{top:12px}}
+
+/* ---------- Balanza ---------- */
+.bal{display:grid;grid-template-columns:760px 1fr;gap:110px;align-items:center;flex:1;min-height:0}
+.bal svg{width:760px;height:auto;display:block;overflow:visible}
+.bal svg text{font-family:var(--f-mono)}
+.controls{display:flex;flex-direction:column;gap:34px;min-width:0}
+.ctl{display:flex;flex-direction:column;gap:14px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--f-mono);font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ctl output{font-family:var(--f-display);font-weight:800;font-size:56px;letter-spacing:.02em;color:var(--chalk);font-variant-numeric:tabular-nums;text-transform:none}
+.ctl.eat output{color:var(--bronze)}
+.ctl.burn output{color:var(--water)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;border-radius:999px;background:var(--stage-3);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:44px;height:44px;border-radius:50%;background:var(--chalk);border:6px solid var(--stage);box-shadow:0 0 0 3px var(--c,var(--bronze))}
+input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;background:var(--chalk);border:6px solid var(--stage);box-shadow:0 0 0 3px var(--c,var(--bronze))}
+.ctl.burn input{--c:var(--water)}
+input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
+.verdict{padding:30px 34px;border-radius:22px;background:var(--stage-2);border:2px solid var(--line);display:flex;flex-direction:column;gap:12px;transition:border-color .5s}
+.verdict .state{font-family:var(--f-display);font-weight:900;font-size:76px;line-height:.95;text-transform:uppercase;transition:color .5s}
+.verdict .phase{font-size:30px}
+.verdict .kg{font-family:var(--f-mono);font-size:26px;color:var(--muted)}
+.verdict[data-s="sup"]{border-color:var(--bronze)} .verdict[data-s="sup"] .state{color:var(--bronze)}
+.verdict[data-s="def"]{border-color:var(--water)} .verdict[data-s="def"] .state{color:var(--water)}
+.verdict[data-s="man"] .state{color:var(--chalk)}
+.presets{display:flex;gap:14px;flex-wrap:wrap}
+.chip{font-family:var(--f-mono);font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:var(--chalk);background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;transition:border-color .3s,background .3s,color .3s}
+.chip:hover{border-color:var(--bronze);background:var(--stage-2)}
+.chip:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.chip[aria-pressed="true"]{background:var(--bronze);border-color:var(--bronze);color:var(--stage)}
+#beam,#panL,#panR{transition:all .7s var(--ease)}
+
+/* ---------- Volumen ---------- */
+.vol{display:grid;grid-template-columns:760px 1fr;gap:90px;align-items:center;flex:1;min-height:0}
+.wall{display:flex;flex-direction:column-reverse;gap:10px;padding:30px;border-bottom:6px solid var(--line)}
+.wall .row{display:flex;gap:10px}
+.wall .row:nth-child(even){padding-left:44px}
+.wall .row:nth-child(odd){padding-right:44px}
+.brick{flex:1;height:52px;border-radius:6px;background:linear-gradient(180deg,var(--muscle-hi),var(--muscle));opacity:0}
+.slide.active .brick{animation:brick .5s var(--ease) both;animation-delay:calc(.3s + var(--i) * .035s)}
+.brick.new{background:linear-gradient(180deg,#f7d684,var(--gold))}
+@keyframes brick{from{opacity:0;transform:translateY(-60px)}to{opacity:1;transform:none}}
+.points{display:flex;flex-direction:column;gap:26px}
+.point{display:flex;flex-direction:column;gap:6px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.point b{font-family:var(--f-display);font-weight:800;font-size:48px;text-transform:uppercase;line-height:1}
+.point span{font-size:29px;color:var(--muted);line-height:1.4}
+
+/* ---------- Definición ---------- */
+#definicion{gap:32px}
+.defi{display:grid;grid-template-columns:940px 1fr;gap:70px;align-items:start;flex:1;min-height:0}
+.defi svg{width:940px;height:auto;overflow:visible}
+.defi svg text{font-family:var(--f-mono)}
+.c-axis{stroke:#3d332a;stroke-width:2}
+.c-grid{stroke:#2b231c;stroke-width:1.5}
+.c-line{fill:none;stroke:#79aee0;stroke-width:6;stroke-linejoin:round;stroke-linecap:round}
+.c-area{fill:url(#defArea)}
+.c-target{stroke:#f2c561;stroke-width:3;stroke-dasharray:12 10}
+.c-dot{fill:#120f0c;stroke:#79aee0;stroke-width:4}
+.c-txt{fill:#a8998a;font-size:22px}
+.c-txt.hi{fill:#f2c561}
+.c-txt.w{fill:#f4ede3;font-size:24px}
+.def-out{display:flex;flex-direction:column;gap:6px;padding:26px 30px;border-radius:22px;background:var(--stage-2);border:2px solid var(--water)}
+.def-out .big{font-family:var(--f-display);font-weight:900;font-size:80px;line-height:.9;color:var(--water)}
+.def-out .sub{font-family:var(--f-mono);font-size:24px;color:var(--muted)}
+.def-ctl{display:flex;flex-direction:column;gap:18px}
+.def-ctl .ctl{gap:6px}
+.def-ctl .ctl output{font-size:40px}
+#definicion .warn p{font-size:24px}
+.warn{display:flex;gap:20px;align-items:flex-start;padding:22px 26px;border-radius:18px;border:2px solid var(--bronze);background:rgba(214,139,76,.08)}
+.warn b{font-family:var(--f-display);font-weight:900;font-size:44px;color:var(--bronze);line-height:1}
+.warn p{font-size:26px;line-height:1.4}
+
+/* ---------- Año ---------- */
+.year-wrap{display:flex;flex-direction:column;gap:20px}
+.year{display:flex;height:120px;border-radius:18px;overflow:hidden;gap:4px}
+.slide.active .year{animation:wipe 1.8s var(--ease) .3s both}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.seg{display:flex;align-items:center;padding:0 26px;font-family:var(--f-display);font-weight:800;font-size:40px;text-transform:uppercase;color:var(--stage);white-space:nowrap;overflow:hidden}
+.seg.v{flex:6.5;background:var(--bronze)}
+.seg.d{flex:4.6;background:var(--water)}
+.seg.p{flex:.5;background:var(--gold);padding:0;justify-content:center}
+.seg.r{flex:1.2;background:var(--muted)}
+.ticks{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:20px;color:var(--muted)}
+.phases{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:24px}
+.phases .card{padding:26px 28px;gap:10px}
+.phases .card h3{font-size:40px}
+.phases .card p{font-size:25px}
+.phases .card .lbl{font-size:20px}
+
+/* ---------- Semana ---------- */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:18px;flex:1;min-height:0}
+#semana{gap:28px}
+.week-block{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+#semana .week{flex:1;gap:14px}
+#semana .day{padding:16px 18px;gap:8px}
+#semana .day b{font-size:34px}
+#semana .day span{font-size:21px}
+.day{display:flex;flex-direction:column;gap:14px;padding:26px 22px;border-radius:20px;background:var(--stage-2);border:2px solid var(--line);min-width:0}
+.day .dn{font-family:var(--f-mono);font-size:24px;letter-spacing:.12em;color:var(--bronze)}
+.day b{font-family:var(--f-display);font-weight:800;font-size:40px;text-transform:uppercase;line-height:1}
+.day span{font-size:24px;color:var(--muted);line-height:1.4}
+.day .int{margin-top:auto;display:flex;gap:6px}
+.day .int i{flex:1;height:12px;border-radius:6px;background:var(--stage-3)}
+.day .int i.f{background:var(--bronze)}
+.day.rest{background:transparent;border-style:dashed}
+.day.rest b{color:var(--muted)}
+.day.focus{border-color:var(--gold)}
+.day.focus .dn{color:var(--gold)}
+
+/* ---------- Enfoques (X) ---------- */
+.xwrap{display:grid;grid-template-columns:440px 1fr;gap:100px;align-items:center;flex:1;min-height:0}
+.fig{position:relative;width:400px;height:640px}
+.fig svg{width:100%;height:100%;display:block}
+.body-part{fill:#3a2c22;transition:fill .5s}
+.xline{stroke:var(--gold);stroke-width:4;stroke-dasharray:14 12;fill:none;opacity:.85}
+.slide.active .xline{animation:dash 1.6s var(--ease) .4s both}
+@keyframes dash{from{stroke-dashoffset:900;opacity:0}to{stroke-dashoffset:0;opacity:.85}}
+.hot{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid var(--gold);background:rgba(18,15,12,.6);cursor:pointer;
+  transition:transform .4s var(--ease),background .4s}
+.hot::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid var(--gold);opacity:0}
+.hot.now{background:var(--gold);transform:scale(1.15)}
+.hot.now::after{animation:ping 1.6s ease-out infinite}
+@keyframes ping{from{opacity:.8;transform:scale(.7)}to{opacity:0;transform:scale(1.5)}}
+.hot:focus-visible{outline:3px solid var(--chalk);outline-offset:4px}
+.zone{display:flex;flex-direction:column;gap:22px;min-width:0}
+.zone-card{padding:34px 38px;border-radius:22px;background:var(--stage-2);border:2px solid var(--line);min-height:260px;display:flex;flex-direction:column;gap:14px}
+.zone-card h3{font-size:64px;color:var(--gold)}
+.zone-card p{font-size:32px}
+.zone-list{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- Descanso ---------- */
+.rest-grid{display:grid;grid-template-columns:1020px 1fr;gap:60px;align-items:center;flex:1;min-height:0}
+.rest-grid svg{width:1020px;height:auto;overflow:visible}
+.rest-grid svg text{font-family:var(--f-mono)}
+.curve{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s var(--ease)}
+.curve.a{stroke:#f2c561}
+.curve.b{stroke:#79aee0}
+#descanso.at-1 .curve.a{stroke-dashoffset:0}
+#descanso.at-2 .curve.b{stroke-dashoffset:0}
+.c-lbl{opacity:0;transition:opacity .6s .9s}
+#descanso.at-1 .c-lbl.a,#descanso.at-2 .c-lbl.b{opacity:1}
+.pillars{display:flex;flex-direction:column;gap:20px}
+.pillar{display:flex;flex-direction:column;gap:4px;padding:22px 26px;border-radius:18px;background:var(--stage-2);border:2px solid var(--line)}
+.pillar b{font-family:var(--f-display);font-weight:900;font-size:58px;color:var(--gold);line-height:1}
+.pillar span{font-size:26px;color:var(--muted)}
+
+/* ---------- Pasos ---------- */
+.steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;flex:1;min-height:0}
+.energy{display:flex;flex-direction:column;gap:18px}
+.ebar{display:flex;height:110px;border-radius:16px;overflow:hidden;gap:4px}
+.slide.active .ebar{animation:wipe 1.6s var(--ease) .3s both}
+.ebar div{display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:800;font-size:38px;color:var(--stage)}
+.e-legend{display:grid;grid-template-columns:1fr 1fr;gap:16px 30px}
+.e-legend div{display:flex;gap:14px;align-items:center;font-size:27px}
+.e-legend i{width:22px;height:22px;border-radius:6px;flex:0 0 22px}
+.e-neat{outline:4px solid var(--gold);outline-offset:-4px}
+.pasos-num{font-family:var(--f-display);font-weight:900;font-size:220px;line-height:.85;color:var(--gold);font-variant-numeric:tabular-nums}
+.pasos-num small{display:block;font-size:56px;color:var(--chalk);margin-top:10px}
+
+/* ---------- Saciantes ---------- */
+.plates{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;flex:1;min-height:0}
+.plate{display:flex;flex-direction:column;align-items:center;gap:18px;padding:30px 24px;border-radius:24px;background:var(--stage-2);border:2px solid var(--line);text-align:center;min-width:0}
+.plate b{font-family:var(--f-display);font-weight:800;font-size:48px;text-transform:uppercase;line-height:1}
+.plate .kc{font-family:var(--f-mono);font-size:24px;color:var(--muted)}
+.disc-box{flex:1;width:100%;display:grid;place-items:center;min-height:300px}
+.disc{width:calc(var(--s) * 1px);height:calc(var(--s) * 1px);border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--c2),var(--c1));transform:scale(0);transition:transform 1s var(--ease)}
+#saciantes.at-1 .disc{transform:scale(1)}
+.grams{font-family:var(--f-display);font-weight:900;font-size:76px;line-height:1;color:var(--gold);opacity:0;transition:opacity .6s .5s}
+#saciantes.at-1 .grams{opacity:1}
+
+/* ---------- Mente ---------- */
+.tips{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1;min-height:0}
+.tips .card{gap:10px;padding:28px 30px}
+.tips .card h3{font-size:40px}
+.tips .card p{font-size:26px}
+.tips .card.mine{border-style:dashed;border-color:var(--gold)}
+
+/* ---------- Peak week ---------- */
+#peak{gap:40px}
+.peak{display:grid;grid-template-columns:760px 1fr;gap:70px;align-items:center;flex:1;min-height:0}
+.peak svg{width:760px;height:auto;overflow:visible}
+.peak svg text{font-family:var(--f-mono)}
+.flow{stroke:#79aee0;stroke-width:20;stroke-linecap:round;stroke-dasharray:22 16;fill:none;opacity:.15;transition:opacity .6s}
+.slide.active .flow{animation:flow .7s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-38}}
+.wlevel{transition:transform 1.6s var(--ease)}
+.mus{transform-box:fill-box;transform-origin:center;transition:transform 1.4s var(--ease)}
+[data-st="1"] .flow.in-f,[data-st="1"] .flow.out-f,[data-st="2"] .flow.out-f{opacity:1}
+[data-st="2"] .wlevel,[data-st="3"] .wlevel,[data-st="4"] .wlevel{transform:translateY(120px)}
+[data-st="3"] .mus,[data-st="4"] .mus{transform:scale(1.22)}
+.peak .warn{margin-top:6px}
+
+/* ---------- Día de competición ---------- */
+#dia .tl{grid-template-columns:repeat(5,1fr)}
+
+#dia .tl-item .y{font-size:58px}
+
+/* ---------- Poses ---------- */
+.poses{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;flex:1;min-height:0}
+.pose{display:flex;flex-direction:column;gap:14px;min-width:0;transition:opacity .5s,transform .5s var(--ease)}
+.pose .ph{flex:1}
+.pose .ph img{object-position:50% 20%}
+.pose b{font-family:var(--f-display);font-weight:800;font-size:36px;text-transform:uppercase;line-height:1.05}
+.poses.focus .pose:not(.now){opacity:.35}
+.pose.now{transform:translateY(-10px)}
+.pose.now .ph{border-color:var(--gold);border-style:solid}
+
+/* ---------- Categorías ---------- */
+#categorias{gap:40px}
+.tabs{display:flex;gap:12px}
+.tabs .chip{font-size:24px;padding:14px 28px}
+.scale{position:relative;padding:20px 0 0}
+.scale-line{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--line),var(--bronze))}
+.scale-ends{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:22px;color:var(--muted);margin-top:56px;letter-spacing:.06em}
+.markers{position:relative;height:120px}
+.mk{position:absolute;bottom:calc(var(--sz) * -.5px - 3px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:14px;background:none;border:none;cursor:pointer;padding:0}
+.mk i{display:block;width:calc(var(--sz) * 1px);height:calc(var(--sz) * 1px);border-radius:50%;background:var(--stage);border:4px solid var(--muted);transition:background .4s,border-color .4s,transform .4s var(--ease)}
+.mk span{font-family:var(--f-display);font-weight:800;font-size:34px;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:color .4s}
+.mk.sel i{background:var(--gold);border-color:var(--gold);transform:scale(1.15)}
+.mk.sel span{color:var(--chalk)}
+.mk:focus-visible{outline:3px solid var(--gold);outline-offset:6px;border-radius:8px}
+.cat-detail{display:grid;grid-template-columns:250px 1fr;gap:44px;align-items:center;padding:26px 40px 26px 26px;border-radius:24px;background:var(--stage-2);border:2px solid var(--line)}
+.cat-photo{height:330px;border-radius:16px}
+.cat-photo img{object-fit:contain;background:#0d0b09}
+.cat-body{display:flex;flex-direction:column;gap:22px;min-width:0}
+.cat-name{font-family:var(--f-display);font-weight:900;font-size:80px;line-height:.9;text-transform:uppercase;color:var(--gold)}
+.cat-cols{display:grid;grid-template-columns:1.4fr .9fr 1.2fr;gap:40px}
+.cat-cols p{font-size:28px;line-height:1.4;margin-top:8px}
+.fx-body{display:flex;flex-direction:column;gap:16px;min-width:0}
+.fx-body p{font-size:27px;line-height:1.4}
+.fx-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 36px}
+.fx-list li{font-size:26px;line-height:1.35;padding-left:28px;position:relative}
+.fx-list li::before{content:"";position:absolute;left:0;top:13px;width:12px;height:12px;border-radius:50%;background:var(--bronze)}
+.cat-cols p b{display:block;font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1.05;text-transform:uppercase;color:var(--chalk)}
+.legend .ph img{object-position:50% 20%}
+.cat-anim{animation:rise .6s var(--ease) both}
+
+/* ---------- Mi caso ---------- */
+#camino .tl{grid-template-columns:repeat(4,1fr)}
+#camino.at-1 .tl-bar{--p:.13} #camino.at-2 .tl-bar{--p:.38} #camino.at-3 .tl-bar{--p:.63} #camino.at-4 .tl-bar{--p:1}
+#camino .tl-item .y{font-size:72px}
+.cam-photos{display:grid;grid-template-columns:1fr 1fr;gap:28px;flex:1;min-height:0}
+.compare-wrap{display:grid;grid-template-columns:900px 1fr;gap:80px;align-items:stretch;flex:1;min-height:0}
+.compare{position:relative;border-radius:22px;overflow:hidden;--x:50%}
+.compare .ph{position:absolute;inset:0;border-radius:22px}
+.kilos{display:flex;flex-direction:column;gap:12px;justify-content:center;min-width:0}
+.kg-stop{display:flex;align-items:baseline;gap:22px}
+.kg-stop b{font-family:var(--f-display);font-weight:900;font-size:88px;line-height:.95;font-variant-numeric:tabular-nums;min-width:230px}
+.kg-stop span{font-family:var(--f-mono);font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kg-delta{margin-left:40px;padding:6px 0 6px 26px;border-left:3px dashed var(--line);font-family:var(--f-mono);font-size:23px}
+.kg-delta.up{color:var(--bronze)}
+.kg-delta.down{color:var(--water)}
+.kg-steps{margin-top:14px;padding:18px 24px;border-radius:16px;background:var(--stage-2);border:2px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.kg-steps b{font-family:var(--f-display);font-weight:900;font-size:56px;line-height:1;color:var(--gold)}
+.kg-steps span{font-size:24px;color:var(--muted)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px;min-height:0}
+.pair .ph{border-style:solid}
+.pair .tagL,.pair .tagR{position:absolute;bottom:20px;z-index:2;font-family:var(--f-mono);font-size:22px;letter-spacing:.1em;padding:8px 16px;border-radius:999px;background:rgba(18,15,12,.8)}
+.pair .tagL{left:20px} .pair .tagR{right:20px;color:var(--gold)}
+.compare .before{z-index:1}
+.compare .after{clip-path:inset(0 0 0 var(--x));z-index:2}
+.compare .before figcaption{margin-right:50%}
+.compare .after figcaption{margin-left:50%}
+.compare .handle{position:absolute;top:0;bottom:0;left:var(--x);width:4px;margin-left:-2px;background:var(--gold);z-index:3;pointer-events:none}
+.compare .handle::after{content:"⟷";position:absolute;top:50%;left:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:var(--gold);color:var(--stage);display:grid;place-items:center;font-size:32px;font-weight:700}
+.compare input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;z-index:4}
+.compare .tagL,.compare .tagR{position:absolute;top:20px;z-index:3;font-family:var(--f-mono);font-size:22px;letter-spacing:.1em;padding:8px 16px;border-radius:999px;background:rgba(18,15,12,.8)}
+.compare .tagL{left:20px} .compare .tagR{right:20px;color:var(--gold)}
+.stats{display:flex;flex-direction:column;gap:22px;justify-content:center}
+.stat{display:flex;flex-direction:column;gap:4px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.stat b{font-family:var(--f-display);font-weight:900;font-size:80px;line-height:.95;color:var(--gold)}
+.stat span{font-family:var(--f-mono);font-size:22px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.podio{display:grid;grid-template-columns:780px 1fr;gap:80px;flex:1;min-height:0}
+.lessons{display:flex;flex-direction:column;gap:22px;justify-content:center}
+.lesson{display:flex;flex-direction:column;gap:8px;padding:26px 30px;border-radius:20px;background:var(--stage-2);border:2px solid var(--line)}
+.lesson b{font-family:var(--f-display);font-weight:800;font-size:46px;text-transform:uppercase;line-height:1.02}
+.lesson span{font-size:27px;color:var(--muted)}
+
+/* ---------- Curiosidades (tarjetas que giran) ---------- */
+.flips{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:24px;flex:1;min-height:0}
+.flip{perspective:1800px;cursor:pointer;background:none;border:none;text-align:left;padding:0;min-width:0}
+.flip:focus-visible{outline:3px solid var(--gold);outline-offset:4px;border-radius:22px}
+.flip-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.flip.flipped .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:30px 34px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.face.front{background:var(--stage-2);border:2px solid var(--line)}
+.face.front b{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1.02;text-transform:uppercase}
+.face.front .q{font-family:var(--f-mono);font-size:20px;color:var(--bronze);letter-spacing:.1em;text-transform:uppercase}
+.face.back{background:linear-gradient(160deg,#2a1f15,#1d1814);border:2px solid var(--gold);transform:rotateY(180deg);justify-content:center}
+.face.back p{font-size:29px;line-height:1.4}
+
+/* ---------- Riesgos ---------- */
+.risk{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.risk .card ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.risk .card li{font-size:28px;line-height:1.35;padding-left:30px;position:relative}
+.risk .card li::before{content:"";position:absolute;left:0;top:15px;width:12px;height:12px;border-radius:50%;background:var(--bronze)}
+.memorial{display:grid;grid-template-columns:auto repeat(3,1fr);gap:30px;align-items:center;padding:26px 34px;border-radius:22px;border:2px solid var(--line)}
+.memorial .lbl{color:var(--muted);line-height:1.4}
+.memorial div b{display:block;font-family:var(--f-display);font-weight:800;font-size:40px;text-transform:uppercase;line-height:1}
+.memorial div span{font-size:24px;color:var(--muted)}
+
+/* ---------- Corazón ---------- */
+.heart-wrap{display:grid;grid-template-columns:1fr 1fr 640px;gap:40px;align-items:end;flex:1;min-height:0}
+.hcol{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.hcol svg{width:340px;height:340px;overflow:visible}
+.heart{transform-box:fill-box;transform-origin:50% 100%;transition:transform 1.6s var(--ease)}
+#corazon.at-1 .heart.big{transform:scale(1.32)}
+.hcol b{font-family:var(--f-display);font-weight:900;font-size:96px;line-height:.9}
+.hcol span{font-family:var(--f-mono);font-size:22px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
+.heart-facts{display:flex;flex-direction:column;gap:20px;align-self:center}
+.heart-facts .card{padding:24px 28px}
+.heart-facts .card p{font-size:26px}
+
+/* ---------- Leyendas ---------- */
+.legends{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1;min-height:0}
+.legend{display:flex;flex-direction:column;gap:16px;min-width:0}
+.legend .ph{flex:1;min-height:0}
+.legend .ttl{font-family:var(--f-display);font-weight:900;font-size:110px;line-height:.85;color:var(--gold)}
+.legend .ttl small{font-size:34px;color:var(--chalk);margin-left:10px;letter-spacing:.02em}
+.legend b{font-family:var(--f-display);font-weight:800;font-size:48px;text-transform:uppercase;line-height:1}
+.legend p{font-size:25px;color:var(--muted);line-height:1.4}
+
+/* ---------- Cierre ---------- */
+#cierre .title{font-size:320px}
+.close-mid{display:flex;flex-direction:column;align-items:center;gap:30px;position:relative}
+.ig{display:inline-flex;align-items:center;gap:14px;font-family:var(--f-mono);font-size:32px;color:var(--chalk);text-decoration:none;letter-spacing:.02em}
+.ig svg{width:44px;height:44px;fill:none;stroke:var(--gold);stroke-width:1.8}
+.ig svg .dot{fill:var(--gold);stroke:none}
+.ig:hover{color:var(--gold)}
+.ig:focus-visible{outline:3px solid var(--gold);outline-offset:6px;border-radius:8px}
+.close-q{font-family:var(--f-display);font-weight:800;font-size:72px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ---------- HUD del presentador ---------- */
+.progress{position:fixed;left:0;bottom:0;height:5px;width:100%;background:var(--bronze);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);z-index:5}
+.hud{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:14px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  font-family:var(--f-mono);font-size:13px;color:var(--muted);opacity:0;transition:opacity .4s;z-index:6;
+  background:linear-gradient(to top,rgba(18,15,12,.9),transparent)}
+.hud.show{opacity:1}
+.hud .sec{letter-spacing:.12em;text-transform:uppercase;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hud .ctrls{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.hud button{background:var(--stage-2);color:var(--chalk);border:1px solid var(--line);border-radius:10px;height:36px;min-width:36px;padding:0 10px;cursor:pointer;display:grid;place-items:center}
+.hud button:hover{border-color:var(--bronze)}
+.hud button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hud .count{font-variant-numeric:tabular-nums;padding:0 6px}
+
+.notes-panel{position:fixed;left:max(16px, env(safe-area-inset-left, 0px));right:max(16px, env(safe-area-inset-right, 0px));bottom:70px;max-width:900px;margin:0 auto;
+  background:rgba(29,24,20,.96);border:1px solid var(--line);border-radius:16px;padding:18px 22px;z-index:7;
+  font-size:16px;line-height:1.5;color:var(--chalk);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.notes-panel header{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px}
+.help{position:fixed;inset:0;display:grid;place-items:center;background:rgba(18,15,12,.85);z-index:8;padding:16px}
+.help div{background:var(--stage-2);border:1px solid var(--line);border-radius:18px;padding:26px 30px;max-width:460px;width:100%;font-size:15px;line-height:1.9}
+.help kbd{font-family:var(--f-mono);font-size:13px;background:var(--stage-3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--gold)}
+.help h4{font-family:var(--f-display);font-weight:800;font-size:28px;text-transform:uppercase;margin-bottom:8px}
+.blackout{position:fixed;inset:0;background:#000;z-index:9}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+</style>
+
+<div class="viewport" id="viewport">
+  <div class="deck" id="deck" aria-live="polite">
+
+    <!-- ===================== PORTADA ===================== -->
+    <section class="slide" id="portada" data-section="Portada" aria-label="Portada">
+      <div class="beam l" aria-hidden="true"></div>
+      <div class="beam c" aria-hidden="true"></div>
+      <div class="beam r" aria-hidden="true"></div>
+      <div class="cover-top">
+        <div class="eyebrow in" style="--d:.2s">Charla interna · 25/11/2026</div>
+        <div class="start-hint">Pulsa → para empezar</div>
+      </div>
+      <div class="cover-mid">
+        <h1 class="title" aria-label="Culturismo">
+          <span style="--i:0">C</span><span style="--i:1">U</span><span style="--i:2">L</span><span style="--i:3">T</span><span style="--i:4">U</span><span style="--i:5">R</span><span style="--i:6">I</span><span style="--i:7">S</span><span style="--i:8">M</span><span style="--i:9">O</span>
+        </h1>
+        <p class="subtitle in" style="--d:1.3s">Lo que pasa antes, durante y después de subir a la tarima</p>
+      </div>
+      <div class="cover-bottom">
+        <div class="who in" style="--d:1.6s">
+          <b>Adrián Casas Cuartero</b>
+          <span class="muted mono" style="font-size:24px">10 años entrenando · culturismo natural</span>
+        </div>
+        <div class="badges in" style="--d:1.8s">
+          <span class="badge">AECN 2023</span>
+          <span class="badge win">AECN 2025 · 3.º Men's Classic</span>
+        </div>
+      </div>
+      <aside class="notes">⏱ 0:00 · Preséntate en 20 segundos: 10 años de gimnasio y dos competiciones de culturismo natural en la AECN (2023 y 2025, tercero en Men's Classic). Di que hoy vas a enseñar lo que no se ve de este deporte. Pregunta rápida a mano alzada: ¿quién ha pisado un gimnasio alguna vez?</aside>
+    </section>
+
+    <!-- ===================== HISTORIA ===================== -->
+    <section class="slide" id="historia" data-section="01 · Qué es el culturismo" data-steps="4" aria-label="Breve historia">
+      <div class="head">
+        <div class="eyebrow in">01 · Un poco de historia</div>
+        <h2 class="in" style="--d:.1s">De los teatros a Las Vegas</h2>
+      </div>
+      <div class="tl fill">
+        <div class="tl-bar"></div>
+        <div class="tl-item" data-step="1"><span class="y">1901</span><b>La primera gran competición</b><p>Eugen Sandow, el "padre del culturismo", organiza un concurso de físicos en el Royal Albert Hall de Londres.</p><figure class="tl-img" style="--pos:50% 10%"><img src="fotos/hist-sandow.jpg" alt="Eugen Sandow posando"></figure></div>
+        <div class="tl-item" data-step="2"><span class="y">1965</span><b>Nace Mr. Olympia</b><p>Joe Weider crea el título más prestigioso. El primer ganador es Larry Scott.</p><figure class="tl-img" style="--pos:60% 22%"><img src="fotos/hist-weider.webp" alt="Joe Weider con un disco de su marca"></figure></div>
+        <div class="tl-item" data-step="3"><span class="y">1977</span><b>Pumping Iron</b><p>Un documental lleva el culturismo al cine y convierte a Arnold Schwarzenegger en estrella.</p><figure class="tl-img" style="--pos:50% 42%"><img src="fotos/hist-pumping.jpg" alt="Cartel de Pumping Iron con Arnold Schwarzenegger"></figure></div>
+        <div class="tl-item" data-step="4"><span class="y">Hoy</span><b>Un deporte global</b><p>El Olympia se celebra en Las Vegas, hay decenas de categorías y federaciones naturales con controles antidopaje.</p><figure class="tl-img" style="--pos:50% 6%"><img src="fotos/hist-olympia.jpg" alt="Ronnie Coleman coronado como Mr. Olympia"></figure></div>
+      </div>
+      <aside class="notes">⏱ 1:00 · Un clic por hito. No te detengas mucho: 15 segundos por fecha. Sandow actuaba en teatros de variedades exhibiendo su físico.</aside>
+    </section>
+
+    <!-- ===================== 01 · QUÉ ES ===================== -->
+    <section class="slide" id="que-es" data-section="01 · Qué es el culturismo" aria-label="Qué es el culturismo">
+      <div class="head">
+        <div class="eyebrow in">01 · Qué es el culturismo</div>
+        <h2 class="in" style="--d:.1s">Se juzga el físico, no la fuerza</h2>
+      </div>
+      <p class="in muted" style="--d:.2s;max-width:1400px">Nadie levanta peso en la competición. Los jueces comparan a los competidores uno al lado del otro y puntúan cuatro cosas:</p>
+      <div class="grid-4 fill">
+        <div class="card in" style="--d:.3s">
+          <svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="12"/></svg>
+          <h3>Masa muscular</h3><p>Cuánto músculo hay, y que se vea lleno y redondo.</p>
+        </div>
+        <div class="card in" style="--d:.4s">
+          <svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 14h40M12 26h40M12 38h40M12 50h40"/></svg>
+          <h3>Definición</h3><p>Tan poca grasa que se ve cada músculo por separado.</p>
+        </div>
+        <div class="card in" style="--d:.5s">
+          <svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6v52"/><path d="M26 16 10 32l16 16"/><path d="M38 16l16 16-16 16"/></svg>
+          <h3>Simetría</h3><p>Que todo encaje: izquierda y derecha, arriba y abajo.</p>
+        </div>
+        <div class="card in" style="--d:.6s">
+          <svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M24 6h16l12 52H12z"/></svg>
+          <h3>Presentación</h3><p>Poses, bronceado y cómo te mueves en la tarima.</p>
+        </div>
+      </div>
+      <aside class="notes">⏱ 2:00 · Mensaje clave: es un deporte estético, como la gimnasia rítmica o el patinaje artístico, pero juzgando el cuerpo. Gana el físico más completo y equilibrado, no necesariamente el más grande. Los jueces comparan en grupos, lado a lado.</aside>
+    </section>
+
+    <!-- ===================== 02 · FIBRA ===================== -->
+    <section class="slide" id="fibra" data-section="02 · Qué pasa cuando entrenas" data-steps="3" aria-label="Qué pasa cuando entrenas">
+      <div class="head">
+        <div class="eyebrow in">02 · Qué pasa cuando entrenas</div>
+        <h2 class="in" style="--d:.1s">Romper un poco para construir más</h2>
+      </div>
+      <div class="two">
+        <svg class="fiber-svg in" style="--d:.2s" viewBox="0 0 860 620" role="img" aria-label="Haz de fibras musculares que se dañan, se reparan y quedan más gruesas">
+          <defs>
+            <pattern id="sarc" width="26" height="20" patternUnits="userSpaceOnUse">
+              <rect width="26" height="20" fill="#8c412c"/><rect x="0" width="8" height="20" fill="#b2603f"/><rect x="16" width="2" height="20" fill="#6b2d1e"/>
+            </pattern>
+            <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff" stop-opacity=".28"/><stop offset=".35" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset=".7" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".5"/>
+            </linearGradient>
+          </defs>
+          <g class="fiber"><rect x="40" y="90" width="740" height="70" rx="35" fill="url(#sarc)"/><rect x="40" y="90" width="740" height="70" rx="35" fill="url(#shade)"/></g>
+          <g class="fiber"><rect x="40" y="190" width="740" height="70" rx="35" fill="url(#sarc)"/><rect x="40" y="190" width="740" height="70" rx="35" fill="url(#shade)"/></g>
+          <g class="fiber"><rect x="40" y="290" width="740" height="70" rx="35" fill="url(#sarc)"/><rect x="40" y="290" width="740" height="70" rx="35" fill="url(#shade)"/></g>
+          <g class="fiber"><rect x="40" y="390" width="740" height="70" rx="35" fill="url(#sarc)"/><rect x="40" y="390" width="740" height="70" rx="35" fill="url(#shade)"/></g>
+          <g class="fiber"><rect x="40" y="490" width="740" height="70" rx="35" fill="url(#sarc)"/><rect x="40" y="490" width="740" height="70" rx="35" fill="url(#shade)"/></g>
+          <path class="crack" pathLength="1" d="M300 92 L286 110 L306 124 L290 142 L304 158"/>
+          <path class="crack" pathLength="1" d="M560 292 L546 310 L566 324 L550 342 L564 358"/>
+          <path class="crack" pathLength="1" d="M220 392 L206 410 L226 424 L210 442 L224 458"/>
+          <circle class="cell" cx="322" cy="125" r="13"/>
+          <circle class="cell" cx="582" cy="325" r="13"/>
+          <circle class="cell" cx="242" cy="425" r="13"/>
+          <g class="grow">
+            <path d="M822 82 L822 568" stroke="#f2c561" stroke-width="3" fill="none"/>
+            <path d="M808 96 L822 80 L836 96 M808 554 L822 570 L836 554" stroke="#f2c561" stroke-width="3" fill="none"/>
+          </g>
+        </svg>
+        <ol class="steps" data-sync="0">
+          <li><span class="n">1</span><div><b>Entrenas</b><span>Levantar peso pone las fibras en tensión.</span></div></li>
+          <li><span class="n">2</span><div><b>Microdaño</b><span>Aparecen pequeñas roturas en las fibras.</span></div></li>
+          <li><span class="n">3</span><div><b>Reparación</b><span>Comida y descanso: las células satélite («albañiles») reparan.</span></div></li>
+          <li><span class="n">4</span><div><b>Más músculo</b><span>La fibra se reconstruye un poco más gruesa que antes.</span></div></li>
+        </ol>
+      </div>
+      <p class="analogy" data-step="3">Como un muro que, cada vez que se agrieta, se repara con más ladrillos de los que tenía.</p>
+      <aside class="notes">⏱ 3:00 · Avanza un clic por fase. Simplificación honesta: el principal motor del crecimiento es la tensión mecánica; el daño acompaña, pero no es el objetivo. Curiosidad: tener agujetas no significa que estés creciendo más. Sin descanso ni proteína no hay paso 3, y sin paso 3 no hay paso 4.</aside>
+    </section>
+
+    <!-- ===================== SOBRECARGA ===================== -->
+    <section class="slide" id="sobrecarga" data-section="02 · Qué pasa cuando entrenas" aria-label="Sobrecarga progresiva">
+      <div class="head">
+        <div class="eyebrow in">02 · La regla de oro</div>
+        <h2 class="in" style="--d:.1s">Sobrecarga progresiva</h2>
+      </div>
+      <div class="over">
+        <svg viewBox="0 0 1000 560" role="img" aria-label="Ejemplo: el peso de una sentadilla sube de 60 a 77,5 kilos en ocho semanas">
+          <line x1="60" y1="480" x2="980" y2="480" stroke="#3d332a" stroke-width="3"/>
+          <g>
+            <rect class="bar" style="--i:0" x="80"  y="240" width="80" height="240" rx="8"/>
+            <rect class="bar" style="--i:1" x="195" y="230" width="80" height="250" rx="8"/>
+            <rect class="bar" style="--i:2" x="310" y="220" width="80" height="260" rx="8"/>
+            <rect class="bar" style="--i:3" x="425" y="210" width="80" height="270" rx="8"/>
+            <rect class="bar" style="--i:4" x="540" y="200" width="80" height="280" rx="8"/>
+            <rect class="bar" style="--i:5" x="655" y="190" width="80" height="290" rx="8"/>
+            <rect class="bar" style="--i:6" x="770" y="180" width="80" height="300" rx="8"/>
+            <rect class="bar" style="--i:7" x="885" y="170" width="80" height="310" rx="8"/>
+          </g>
+          <g font-size="24" text-anchor="middle" fill="#f4ede3">
+            <text class="bar-lbl" style="--i:0" x="120" y="222">60</text><text class="bar-lbl" style="--i:1" x="235" y="212">62,5</text>
+            <text class="bar-lbl" style="--i:2" x="350" y="202">65</text><text class="bar-lbl" style="--i:3" x="465" y="192">67,5</text>
+            <text class="bar-lbl" style="--i:4" x="580" y="182">70</text><text class="bar-lbl" style="--i:5" x="695" y="172">72,5</text>
+            <text class="bar-lbl" style="--i:6" x="810" y="162">75</text><text class="bar-lbl" style="--i:7" x="925" y="152" fill="#f2c561">77,5 kg</text>
+          </g>
+          <g font-size="22" text-anchor="middle" fill="#a8998a">
+            <text x="120" y="516">S1</text><text x="235" y="516">S2</text><text x="350" y="516">S3</text><text x="465" y="516">S4</text>
+            <text x="580" y="516">S5</text><text x="695" y="516">S6</text><text x="810" y="516">S7</text><text x="925" y="516">S8</text>
+          </g>
+          <text x="60" y="556" font-size="20" fill="#a8998a">Ejemplo: sentadilla, semana a semana</text>
+        </svg>
+        <div class="ways in" style="--d:.4s">
+          <p style="font-size:30px">Si siempre levantas lo mismo, el cuerpo deja de tener motivos para cambiar. Cada semana hay que pedirle un poco más:</p>
+          <div><b>+</b><span>Más peso</span></div>
+          <div><b>+</b><span>Más repeticiones</span></div>
+          <div><b>+</b><span>Más series</span></div>
+          <div><b>+</b><span>Mejor técnica y control</span></div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 4:30 · El músculo se adapta a lo que le pides. Si le pides siempre lo mismo, no tiene por qué crecer. Las cifras del gráfico son un ejemplo. Puedes contar tu progresión en algún ejercicio.</aside>
+    </section>
+
+    <!-- ===================== TÉCNICA ===================== -->
+    <section class="slide" id="tecnica" data-section="02 · Qué pasa cuando entrenas" aria-label="Técnica y prevención de lesiones">
+      <div class="head">
+        <div class="eyebrow in">02 · Prevenir lesiones</div>
+        <h2 class="in" style="--d:.1s">La técnica es tu seguro</h2>
+      </div>
+      <div class="grid-2 tech fill">
+        <div class="card in" style="--d:0.25s"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8c8 10 14 16 14 26a14 14 0 0 1-28 0c0-6 3-10 6-13 0 6 3 9 6 9 0-8-2-14 2-22z"/></svg><div><h3>Calienta siempre</h3><p>5–10 minutos de movilidad y series ligeras de aproximación antes del peso real.</p></div></div>
+        <div class="card in" style="--d:0.37s"><div class="tempo" aria-hidden="true"><i></i></div><div><h3>Controla la bajada</h3><p>Bajar lento (2–3 s) y subir con fuerza. La bajada es donde más se trabaja y donde más te puedes lesionar si la sueltas.</p></div></div>
+        <div class="card in" style="--d:0.49s"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 32h48"/><path d="M14 22v20M50 22v20M20 26v12M44 26v12"/></svg><div><h3>Recorrido antes que kilos</h3><p>Mover el peso en todo su recorrido. Cargar de más con medio movimiento es "levantar con el ego".</p></div></div>
+        <div class="card in" style="--d:0.61s"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24"/><path d="M32 18v18M32 44v2"/></svg><div><h3>Escucha al cuerpo</h3><p>Ardor o agujetas en el músculo: normal. Dolor punzante en una articulación: se para.</p></div></div>
+      </div>
+      <aside class="notes">⏱ 5:30 · Las cuatro tarjetas aparecen a la vez. La bola amarilla de la segunda tarjeta marca el ritmo: 3 segundos bajando, 1 subiendo. Cuenta alguna lesión o susto tuyo si lo tienes.</aside>
+    </section>
+
+    <!-- ===================== 03 · BALANZA ===================== -->
+    <section class="slide" id="balanza" data-section="03 · Las calorías mandan" aria-label="La balanza energética">
+      <div class="head">
+        <div class="eyebrow in">03 · Las calorías mandan</div>
+        <h2 class="in" style="--d:.1s">La balanza que decide si subes o bajas</h2>
+      </div>
+      <div class="bal">
+        <svg class="in" style="--d:.2s" viewBox="0 0 820 640" role="img" aria-label="Balanza: a la izquierda lo que comes, a la derecha lo que gastas">
+          <path d="M410 190 L360 580 L460 580 Z" fill="#2b231c"/>
+          <rect x="300" y="580" width="220" height="22" rx="11" fill="#3d332a"/>
+          <line id="beam" x1="130" y1="190" x2="690" y2="190" stroke="#f4ede3" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="410" cy="190" r="20" fill="#f2c561"/>
+          <g id="panL" transform="translate(130 190)">
+            <line x1="0" y1="0" x2="-100" y2="170" stroke="#a8998a" stroke-width="3"/><line x1="0" y1="0" x2="100" y2="170" stroke="#a8998a" stroke-width="3"/>
+            <path d="M-120 170 Q0 262 120 170 Z" fill="#d68b4c"/>
+            <text id="valL" x="0" y="212" text-anchor="middle" font-size="28" fill="#120f0c" font-weight="500">2600</text>
+            <text x="0" y="300" text-anchor="middle" font-size="24" fill="#d68b4c" letter-spacing="3">COMES</text>
+          </g>
+          <g id="panR" transform="translate(690 190)">
+            <line x1="0" y1="0" x2="-100" y2="170" stroke="#a8998a" stroke-width="3"/><line x1="0" y1="0" x2="100" y2="170" stroke="#a8998a" stroke-width="3"/>
+            <path d="M-120 170 Q0 262 120 170 Z" fill="#79aee0"/>
+            <text id="valR" x="0" y="212" text-anchor="middle" font-size="28" fill="#120f0c" font-weight="500">2600</text>
+            <text x="0" y="300" text-anchor="middle" font-size="24" fill="#79aee0" letter-spacing="3">GASTAS</text>
+          </g>
+        </svg>
+        <div class="controls in" style="--d:.3s">
+          <div class="ctl eat">
+            <label for="kIn"><span>Comes al día</span><output id="oIn">2600 kcal</output></label>
+            <input id="kIn" type="range" min="1500" max="4200" step="50" value="2600">
+          </div>
+          <div class="ctl burn">
+            <label for="kOut"><span>Gastas al día</span><output id="oOut">2600 kcal</output></label>
+            <input id="kOut" type="range" min="1800" max="3800" step="50" value="2600">
+          </div>
+          <div class="verdict" id="verdict" data-s="man">
+            <div class="state" id="vState">Mantenimiento</div>
+            <div class="phase" id="vPhase">Tu peso se queda donde está.</div>
+            <div class="kg" id="vKg">≈ 0,0 kg al mes (estimación)</div>
+          </div>
+          <div class="presets" aria-label="Ejemplos rápidos">
+            <button type="button" class="chip" data-in="2950" data-out="2600">Volumen</button>
+            <button type="button" class="chip" data-in="2600" data-out="2600">Mantenimiento</button>
+            <button type="button" class="chip" data-in="2050" data-out="2600">Definición</button>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 6:30 · Mueve el deslizador o pide a alguien del público que diga cuánto cree que come. Tres estados: mantenimiento, superávit (volumen) y déficit (definición). Regla aproximada: 1 kg de grasa ≈ 7.700 kcal. Los botones de abajo ponen ejemplos rápidos.</aside>
+    </section>
+
+    <!-- ===================== VOLUMEN ===================== -->
+    <section class="slide" id="volumen" data-section="03 · Las calorías mandan" aria-label="Fase de volumen">
+      <div class="head">
+        <div class="eyebrow in">03 · Fase 1</div>
+        <h2 class="in" style="--d:.1s">Volumen: construir la casa</h2>
+      </div>
+      <div class="vol">
+        <div class="wall" id="wall" aria-hidden="true"></div>
+        <div class="points">
+          <div class="point in" style="--d:.4s"><b class="bronze">Superávit moderado</b><span>Comer algo más de lo que gastas, sin pasarse: el objetivo es músculo, no grasa.</span></div>
+          <div class="point in" style="--d:.55s"><b class="bronze">Mucho entrenamiento</b><span>Más series y más días. Es cuando hay energía para entrenar duro y progresar.</span></div>
+          <div class="point in" style="--d:.7s"><b class="bronze">Paciencia</b><span>Ocupa la mayor parte del año. En alguien avanzado, cada kilo de músculo cuesta meses.</span></div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 7:30 · Los ladrillos dorados de arriba son el músculo nuevo. Comer más no significa comer cualquier cosa: un volumen "sucio" acaba en grasa que luego hay que quitar en definición, y eso alarga el déficit. Di cuántos meses de volumen hiciste tú y con cuántas calorías aproximadas [TUS DATOS].</aside>
+    </section>
+
+    <!-- ===================== DEFINICIÓN (calculadora) ===================== -->
+    <section class="slide" id="definicion" data-section="03 · Las calorías mandan" aria-label="Calculadora de definición">
+      <div class="head">
+        <div class="eyebrow in">03 · Fase 2 · definición</div>
+        <h2 class="in" style="--d:.1s">¿Cuántos meses de definición?</h2>
+      </div>
+      <div class="defi">
+        <svg class="in" style="--d:.2s" id="defChart" viewBox="0 0 1000 500" role="img" aria-label="Proyección del peso semana a semana hasta el peso de competición"></svg>
+        <div class="def-ctl in" style="--d:.3s">
+          <div class="def-out"><span class="big" id="dWeeks">20 semanas</span><span class="sub" id="dMonths">≈ 4,6 meses de definición</span></div>
+          <div class="ctl burn"><label for="dW0"><span>Peso al empezar</span><output id="oW0">95 kg</output></label><input id="dW0" type="range" min="60" max="120" step="0.5" value="95"></div>
+          <div class="ctl"><label for="dW1"><span>Peso de tarima</span><output id="oW1" class="gold">78 kg</output></label><input id="dW1" type="range" min="50" max="110" step="0.5" value="78" style="--c:var(--gold)"></div>
+          <div class="ctl eat"><label for="dR"><span>Pérdida semanal</span><output id="oR">1,0 %</output></label><input id="dR" type="range" min="0.3" max="1.5" step="0.1" value="1"></div>
+        </div>
+      </div>
+      <div class="warn in" style="--d:.5s"><b>!</b><p>Más del 1 % semanal se come el músculo. Y con poca comida el cuerpo se recupera peor: en un déficit largo se entrena menos volumen y con más control, porque es más fácil lesionarse.</p></div>
+      <aside class="notes">⏱ 8:30 · Calculadora en directo, ya con tus datos: 95 kg al acabar el volumen, 78 kg en tarima y un 1 % semanal dan 20 semanas, exactamente lo que hiciste. Después puedes mover los deslizadores para enseñar qué pasaría con otro ritmo. La recomendación habitual para naturales es perder entre 0,5 % y 1 % del peso por semana; por eso las definiciones duran 4–6 meses. Pregunta: "¿Quién aguantaría 5 meses a dieta?".</aside>
+    </section>
+
+    <!-- ===================== 04 · AÑO ===================== -->
+    <section class="slide" id="ano" data-section="04 · La preparación" aria-label="Un año de preparación">
+      <div class="head">
+        <div class="eyebrow in">04 · La preparación</div>
+        <h2 class="in" style="--d:.1s">Un año en cuatro fases</h2>
+      </div>
+      <div class="year-wrap">
+        <div class="year" role="img" aria-label="Volumen unos 6 meses y medio, definición unos 4 meses y medio, peak week y competición, y recuperación">
+          <div class="seg v">Volumen</div><div class="seg d">Definición</div><div class="seg p" title="Peak week y competición">★</div><div class="seg r">Vuelta</div>
+        </div>
+        <div class="ticks"><span>Mes 1</span><span>Mes 3</span><span>Mes 5</span><span>Mes 7</span><span>Mes 9</span><span>Mes 11</span><span>Competición</span></div>
+      </div>
+      <div class="phases fill">
+        <div class="card in" style="--d:0.60s"><span class="lbl">≈ 6–7 meses</span><h3 class="bronze">Volumen</h3><p>Superávit y mucho entrenamiento. Se construye el músculo que luego se enseña.</p></div>
+        <div class="card in" style="--d:0.75s"><span class="lbl" style="color:var(--water)">≈ 16–20 semanas</span><h3 class="water-c">Definición</h3><p>Déficit, más pasos y entrenamiento más controlado. Se quita la grasa que tapa el músculo.</p></div>
+        <div class="card in" style="--d:0.90s"><span class="lbl" style="color:var(--gold)">Última semana + después</span><h3 class="gold">Tarima y vuelta</h3><p>Peak week, competición y una subida de comida gradual.</p></div>
+      </div>
+      <aside class="notes">⏱ 10:00 · Ajusta las duraciones a tu calendario real [TUS FECHAS]. La "vuelta" importa: después de competir se sube la comida poco a poco para recuperar la salud hormonal y no rebotar de golpe.</aside>
+    </section>
+
+    <!-- ===================== SEMANA ===================== -->
+    <section class="slide" id="semana" data-section="04 · La preparación" aria-label="Una semana de entrenamiento">
+      <div class="head">
+        <div class="eyebrow in">04 · Día a día</div>
+        <h2 class="in" style="--d:.1s">Una semana de entrenamiento</h2>
+      </div>
+      <div class="week-block">
+      <span class="lbl in" style="--d:.1s">Ejemplo</span>
+      <div class="week">
+        <div class="day in" style="--d:.15s"><span class="dn">LUN</span><b>Torso</b><span>Pecho, espalda y hombros. Pesado.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day in" style="--d:.22s"><span class="dn">MAR</span><b>Pierna</b><span>Cuádriceps, femoral y glúteo.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day rest in" style="--d:.29s"><span class="dn">MIÉ</span><b>Descanso</b><span>Pasos y movilidad.</span><div class="int"><i></i><i></i><i></i></div></div>
+        <div class="day in" style="--d:.36s"><span class="dn">JUE</span><b>Torso</b><span>Más series, menos peso.</span><div class="int"><i class="f"></i><i class="f"></i><i></i></div></div>
+        <div class="day in" style="--d:.43s"><span class="dn">VIE</span><b>Pierna</b><span>Más series, menos peso.</span><div class="int"><i class="f"></i><i class="f"></i><i></i></div></div>
+        <div class="day focus in" style="--d:.5s"><span class="dn">SÁB</span><b>Puntos débiles</b><span>Lo que va atrasado: hombros y brazos.</span><div class="int"><i class="f"></i><i class="f"></i><i></i></div></div>
+        <div class="day rest in" style="--d:.57s"><span class="dn">DOM</span><b>Descanso</b><span>Recuperar de verdad.</span><div class="int"><i></i><i></i><i></i></div></div>
+      </div>
+      </div>
+      <div class="week-block">
+      <span class="lbl in" style="--d:.65s">Mi rutina</span>
+      <div class="week">
+        <div class="day in" style="--d:.7s"><span class="dn">LUN</span><b>Pecho + Tríceps</b><span>Pecho y parte de atrás del brazo.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day in" style="--d:.77s"><span class="dn">MAR</span><b>Espalda + Bíceps</b><span>Espalda y parte de delante del brazo.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day in" style="--d:.84s"><span class="dn">MIÉ</span><b>Pierna + Abdomen</b><span>Pierna completa y abdomen.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day rest in" style="--d:.91s"><span class="dn">JUE</span><b>Descanso</b><span>Pasos y movilidad.</span><div class="int"><i></i><i></i><i></i></div></div>
+        <div class="day in" style="--d:.98s"><span class="dn">VIE</span><b>Torso</b><span>Pecho, espalda y hombros.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day in" style="--d:1.05s"><span class="dn">SÁB</span><b>Pierna</b><span>Cuádriceps, femoral y glúteo.</span><div class="int"><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+        <div class="day rest in" style="--d:1.12s"><span class="dn">DOM</span><b>Descanso</b><span>Recuperar de verdad.</span><div class="int"><i></i><i></i><i></i></div></div>
+      </div>
+      </div>
+      <p class="analogy in" style="--d:1.25s">Cada sesión: calentamiento → ejercicios básicos pesados → ejercicios de aislamiento → pasos.</p>
+      <aside class="notes">⏱ 11:00 · Dos formas de organizar la semana: arriba un ejemplo de torso / pierna y abajo tu rutina real. Las barras indican la intensidad [AJUSTA LA DE TU RUTINA]. Explica que cada músculo se entrena unas dos veces por semana y que los días de descanso están planificados, no son "días libres".</aside>
+    </section>
+
+    <!-- ===================== ENFOQUES ===================== -->
+    <section class="slide" id="enfoque" data-section="04 · La preparación" data-steps="5" aria-label="Enfoques musculares">
+      <div class="head">
+        <div class="eyebrow in">04 · Enfoques musculares</div>
+        <h2 class="in" style="--d:.1s">Construir una X</h2>
+      </div>
+      <div class="xwrap">
+        <div class="fig in" style="--d:.2s">
+          <svg viewBox="0 0 500 800" role="img" aria-label="Silueta con forma de X: hombros anchos, cintura estrecha y piernas anchas">
+            <g class="body-part">
+              <circle cx="250" cy="70" r="40"/>
+              <rect x="228" y="100" width="44" height="40" rx="10"/>
+              <path d="M130 150 L370 150 L315 400 L185 400 Z"/>
+              <ellipse cx="125" cy="185" rx="48" ry="42"/><ellipse cx="375" cy="185" rx="48" ry="42"/>
+              <path d="M88 200 L132 214 L118 430 L78 424 Z"/><path d="M412 200 L368 214 L382 430 L422 424 Z"/>
+              <path d="M185 395 L315 395 L338 470 L162 470 Z"/>
+              <path d="M162 465 Q130 570 196 652 L238 652 Q254 560 250 465 Z"/><path d="M338 465 Q370 570 304 652 L262 652 Q246 560 250 465 Z"/>
+              <path d="M196 652 Q172 720 204 792 L234 792 Q246 720 238 652 Z"/><path d="M304 652 Q328 720 296 792 L266 792 Q254 720 262 652 Z"/>
+            </g>
+            <path class="xline" d="M80 140 L420 690"/>
+            <path class="xline" d="M420 140 L80 690"/>
+          </svg>
+          <button type="button" class="hot" style="left:75%;top:23%" data-z="1" aria-label="Hombros"></button>
+          <button type="button" class="hot" style="left:31%;top:35%" data-z="2" aria-label="Espalda"></button>
+          <button type="button" class="hot" style="left:50%;top:48%" data-z="3" aria-label="Cintura"></button>
+          <button type="button" class="hot" style="left:40%;top:68%" data-z="4" aria-label="Piernas"></button>
+          <button type="button" class="hot" style="left:61%;top:90%" data-z="5" aria-label="Gemelos"></button>
+        </div>
+        <div class="zone">
+          <p class="in" style="--d:.3s">El objetivo es una silueta en <b class="gold">X</b>: arriba ancho, cintura estrecha, abajo ancho. Lo que va atrasado se entrena primero en la semana y con más series.</p>
+          <div class="zone-card in" style="--d:.4s" id="zoneCard">
+            <span class="lbl" id="zoneLbl">Toca un punto</span>
+            <h3 id="zoneName">La silueta en X</h3>
+            <p id="zoneText" class="muted">Cada zona tiene su papel en el físico final. Avanza para recorrerlas.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 12:00 · Un clic por zona, o toca los círculos de la figura. Cuenta cuál fue tu punto débil y cómo lo trabajaste [TU PUNTO DÉBIL]. En Classic se premia especialmente la cintura estrecha y el vacío abdominal.</aside>
+    </section>
+
+    <!-- ===================== DESCANSO ===================== -->
+    <section class="slide" id="descanso" data-section="04 · La preparación" data-steps="3" aria-label="La importancia del descanso">
+      <div class="head">
+        <div class="eyebrow in">04 · Descanso</div>
+        <h2 class="in" style="--d:.1s">El músculo crece cuando descansas</h2>
+      </div>
+      <div class="rest-grid">
+        <svg viewBox="0 0 1020 560" role="img" aria-label="Con descanso, el rendimiento cae tras entrenar y sube por encima del nivel inicial; sin descanso, sigue cayendo">
+          <line x1="40" y1="280" x2="1000" y2="280" stroke="#3d332a" stroke-width="3" stroke-dasharray="10 10"/>
+          <text x="40" y="262" font-size="22" fill="#a8998a">Nivel inicial</text>
+          <path d="M60 280 L60 380" stroke="#d68b4c" stroke-width="4"/>
+          <text x="72" y="410" font-size="22" fill="#d68b4c">Entrenas</text>
+          <path class="curve a" pathLength="1" d="M60 280 C120 280 130 400 220 400 C320 400 380 280 460 220 C520 180 560 175 620 180 C700 186 760 200 1000 205"/>
+          <path class="curve b" pathLength="1" d="M220 400 C260 400 270 430 300 445 L300 445 C340 465 350 475 380 488 C420 505 450 512 520 530"/>
+          <g class="c-lbl a" font-size="24" fill="#f2c561"><text x="560" y="150">Con descanso: subes de nivel</text></g>
+          <g class="c-lbl b" font-size="24" fill="#79aee0"><text x="540" y="534">Sin descanso: cada vez peor</text></g>
+          <text x="40" y="550" font-size="20" fill="#a8998a">Tiempo →</text>
+        </svg>
+        <div class="pillars">
+          <div class="pillar" data-step="3"><b>7–9 h</b><span>de sueño: es cuando más se repara</span></div>
+          <div class="pillar" data-step="3"><b>1–2 días</b><span>sin pesas a la semana</span></div>
+          <div class="pillar" data-step="3"><b>48–72 h</b><span>antes de volver a castigar el mismo músculo</span></div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 13:00 · Clic 1: curva dorada (supercompensación: tras entrenar estás peor, descansas y acabas mejor que antes). Clic 2: curva azul, si vuelves a entrenar sin recuperar, cada sesión te hunde más (sobreentrenamiento y lesiones). Clic 3: las tres cifras. Son orientativas.</aside>
+    </section>
+
+    <!-- ===================== PASOS ===================== -->
+    <section class="slide" id="pasos" data-section="04 · La preparación" aria-label="Mantener el déficit: los pasos">
+      <div class="head">
+        <div class="eyebrow in">04 · Mantener el déficit</div>
+        <h2 class="in" style="--d:.1s">Moverse fuera del gimnasio</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="energy in" style="--d:.2s">
+          <span class="lbl">En qué gastas la energía de un día (aprox.)</span>
+          <div class="ebar">
+            <div style="flex:60;background:var(--muted)">60 %</div>
+            <div class="e-neat" style="flex:20;background:var(--gold)">20 %</div>
+            <div style="flex:10;background:var(--water)">10 %</div>
+            <div style="flex:10;background:var(--bronze)">10 %</div>
+          </div>
+          <div class="e-legend">
+            <div><i style="background:var(--muted)"></i>Mantenerte vivo</div>
+            <div><i style="background:var(--gold)"></i><b>Moverte: pasos, de pie…</b></div>
+            <div><i style="background:var(--water)"></i>Digerir la comida</div>
+            <div><i style="background:var(--bronze)"></i>El entrenamiento</div>
+          </div>
+          <p class="muted" style="font-size:27px">Varía mucho entre personas. En déficit, el cuerpo ahorra energía y te mueves menos sin darte cuenta.</p>
+        </div>
+        <div class="in" style="--d:.35s">
+          <div class="pasos-num"><span id="pasosNum">0</span><small>pasos al día</small></div>
+          <p style="margin-top:30px">Contar pasos evita que el cuerpo "haga trampas". Y cada paso extra es margen para comer un poco más.</p>
+        </div>
+      </div>
+      <aside class="notes">⏱ 14:00 · Dato sorprendente: el entrenamiento es una parte pequeña del gasto diario; moverse durante el día pesa más. Pon tu objetivo de pasos real [TUS PASOS, ahora 12.000 de ejemplo]. Porcentajes aproximados.</aside>
+    </section>
+
+    <!-- ===================== SACIANTES ===================== -->
+    <section class="slide" id="saciantes" data-section="04 · La preparación" data-steps="2" aria-label="Comidas saciantes">
+      <div class="head">
+        <div class="eyebrow in">04 · Pregunta al público</div>
+        <h2 class="in" style="--d:.1s">¿Qué llena más con 300 kcal?</h2>
+      </div>
+      <div class="plates">
+        <div class="plate in" style="--d:.2s"><b>Fresas</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:300;--c1:#a3343a;--c2:#e2646b"></div></div><span class="grams">940 g</span></div>
+        <div class="plate in" style="--d:.3s"><b>Patata cocida</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:183;--c1:#b08a3e;--c2:#e8c879"></div></div><span class="grams">350 g</span></div>
+        <div class="plate in" style="--d:.4s"><b>Almendras</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:70;--c1:#7a4e2e;--c2:#b07a4e"></div></div><span class="grams">52 g</span></div>
+        <div class="plate in" style="--d:.5s"><b>Aceite de oliva</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:57;--c1:#7c8a2e;--c2:#c8cf6a"></div></div><span class="grams">34 g</span></div>
+      </div>
+      <p class="analogy" data-step="2">En definición mandan los platos grandes y poco calóricos: verdura, fruta, patata, carne magra, claras de huevo…</p>
+      <aside class="notes">⏱ 15:00 · Pregunta al público cuál llena más. Clic 1: aparecen los gramos (las bolas están a escala de peso). 34 g de aceite son unas 3 cucharadas. Clic 2: la regla. Añade tus comidas saciantes favoritas [TUS TRUCOS: gelatina, palomitas, etc.].</aside>
+    </section>
+
+    <!-- ===================== PREGUNTA DEL AGUA ===================== -->
+    <section class="slide" id="agua" data-section="04 · La preparación" data-steps="3" aria-label="Pregunta al público: el agua">
+      <div class="head">
+        <div class="eyebrow in">04 · Curiosidad</div>
+        <h2 class="in" style="--d:.1s">¿Cuánta agua bebe un culturista al día en su última semana antes de competir?</h2>
+      </div>
+      <div class="options">
+        <div class="opt in" style="--d:.25s"><span class="k">A</span><span class="v">2 litros</span></div>
+        <div class="opt in" style="--d:.35s"><span class="k">B</span><span class="v">4 litros</span></div>
+        <div class="opt in" style="--d:.45s"><span class="k">C</span><span class="v">6 litros</span></div>
+        <div class="opt correct in" style="--d:.55s"><span class="k">D</span><span class="v">Más de 8</span><span class="tick" aria-hidden="true">✓</span></div>
+      </div>
+      <div class="water" data-step="2">
+        <div class="liters"><span id="litersNum">0</span><small>L</small></div>
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div class="bottles" aria-hidden="true">
+            <div class="bottle" style="--i:0"><i></i></div><div class="bottle" style="--i:1"><i></i></div>
+            <div class="bottle" style="--i:2"><i></i></div><div class="bottle" style="--i:3"><i></i></div>
+            <div class="bottle" style="--i:4"><i></i></div><div class="bottle" style="--i:5"><i></i></div>
+            <div class="bottle" style="--i:6"><i></i></div><div class="bottle" style="--i:7"><i></i></div>
+            <div class="bottle" style="--i:8"><i></i></div><div class="bottle" style="--i:9"><i></i></div>
+          </div>
+          <p class="muted">Cada botella, 1 litro. Una persona media bebe unos 2 al día.</p>
+        </div>
+      </div>
+      <p class="teaser" data-step="3">…y el día antes de competir, casi nada. Ahora veréis por qué.</p>
+      <aside class="notes">⏱ 17:00 · Lee la pregunta y deja que el público responda (A, B, C, D). Pulsa → para revelar la respuesta y otra vez para llenar las botellas. Respuesta: en la carga de agua se llegan a beber 8–10 litros al día [CONFIRMA TU CIFRA REAL]. Último clic: el gancho; la explicación llega en la siguiente diapositiva, la peak week.</aside>
+    </section>
+
+    <!-- ===================== PEAK WEEK ===================== -->
+    <section class="slide" id="peak" data-section="04 · La preparación" data-steps="4" aria-label="Peak week: agua, sal y carbohidratos">
+      <div class="head">
+        <div class="eyebrow in">04 · Última semana</div>
+        <h2 class="in" style="--d:.1s">Peak week: el truco del agua</h2>
+      </div>
+      <div class="peak">
+        <svg class="in" style="--d:.2s" id="tank" data-st="0" viewBox="0 0 760 620" role="img" aria-label="Depósito que representa el cuerpo: entra agua y sal por arriba y sale por los riñones abajo">
+          <defs>
+            <pattern id="sarc2" width="26" height="20" patternUnits="userSpaceOnUse">
+              <rect width="26" height="20" fill="#8c412c"/><rect x="0" width="8" height="20" fill="#b2603f"/>
+            </pattern>
+            <clipPath id="tankClip"><rect x="166" y="146" width="428" height="388" rx="24"/></clipPath>
+          </defs>
+          <path d="M20 60 H300 V104" stroke="#3d332a" stroke-width="30" fill="none" stroke-linejoin="round"/>
+          <text x="20" y="30" font-size="22" fill="#79aee0" letter-spacing="2">AGUA Y SAL</text>
+          <path class="flow in-f" d="M300 110 V300"/>
+          <g clip-path="url(#tankClip)">
+            <rect class="wlevel" x="160" y="230" width="440" height="420" fill="#79aee0" fill-opacity=".32"/>
+            <ellipse class="mus" cx="380" cy="420" rx="130" ry="72" fill="url(#sarc2)"/>
+          </g>
+          <rect x="160" y="140" width="440" height="400" rx="30" fill="none" stroke="#a8998a" stroke-width="5"/>
+          <text x="186" y="186" font-size="20" fill="#a8998a">TU CUERPO</text>
+          <text x="380" y="512" font-size="20" fill="#f4ede3" text-anchor="middle">MÚSCULO</text>
+          <path d="M540 540 V580 H700" stroke="#3d332a" stroke-width="30" fill="none" stroke-linejoin="round"/>
+          <path class="flow out-f" d="M705 580 H750"/>
+          <text x="560" y="618" font-size="22" fill="#79aee0" letter-spacing="2">RIÑONES</text>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+          <ol class="steps" data-sync="1">
+            <li><span class="n">1</span><div><b>Carga</b><span>Días bebiendo mucha agua y sal. El cuerpo se adapta y empieza a orinar muchísimo.</span></div></li>
+            <li><span class="n">2</span><div><b>Corte</b><span>Se cierra el grifo. Durante horas el cuerpo sigue eliminando como antes y baja el agua bajo la piel.</span></div></li>
+            <li><span class="n">3</span><div><b>Carbohidratos</b><span>El músculo guarda glucógeno, y cada gramo arrastra unos 3 g de agua dentro: se ve lleno.</span></div></li>
+          </ol>
+          <div class="warn" data-step="4"><b>!</b><p>La ciencia que respalda la manipulación de agua y sal es escasa, y es lo que provoca deshidratación y desmayos en la tarima.</p></div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 18:00 · Aquí resuelves la pregunta del agua de la diapositiva anterior. Analogía: el cuerpo es un depósito con grifo y desagüe. Si bebes mucho varios días, el cuerpo "abre el desagüe" (las hormonas que retienen agua se relajan). Si de repente cierras el grifo, el desagüe tarda en cerrarse y el depósito baja. Los carbohidratos llenan el músculo. Explica tu protocolo real [TU PEAK WEEK]. Fuente: Escalante et al., 2021: hay muy poca evidencia sobre agua y sodio; la de carbohidratos es algo mejor.</aside>
+    </section>
+
+    <!-- ===================== DÍA DE COMPETICIÓN ===================== -->
+    <section class="slide" id="dia" data-section="04 · La preparación" aria-label="El día de la competición">
+      <div class="head">
+        <div class="eyebrow in">04 · El gran día</div>
+        <h2 class="in" style="--d:.1s">El día de la competición</h2>
+      </div>
+      <div class="tl fill">
+        <div class="tl-bar" style="--p:1"></div>
+        <div class="tl-item in" style="--d:0.25s"><span class="y">Día antes</span><b>Tinte</b><p>Varias capas de bronceador. Bajo los focos la piel clara "borra" el músculo; el moreno marca sombras.</p></div>
+        <div class="tl-item in" style="--d:0.37s"><span class="y">Mañana</span><b>Comidas pequeñas</b><p>Arroz, miel, algo dulce. Llenar sin hincharse.</p></div>
+        <div class="tl-item in" style="--d:0.49s"><span class="y">−20 min</span><b>Bombeo</b><p>Gomas elásticas y flexiones en el backstage para llenar el músculo de sangre.</p></div>
+        <div class="tl-item in" style="--d:0.61s"><span class="y">Tarima</span><b>Comparaciones</b><p>Giros de cuarto y poses obligatorias, al lado de tus rivales.</p></div>
+        <div class="tl-item in" style="--d:0.73s"><span class="y">Final</span><b>Rutina libre</b><p>Tu coreografía de poses con música. Aquí se gana al público.</p></div>
+      </div>
+      <aside class="notes">⏱ 19:30 · Todos los momentos aparecen a la vez; recórrelos de izquierda a derecha. Cuenta cómo fue tu día en la AECN: a qué hora empezaste, qué comiste, cómo es el backstage [TU DÍA]. Confirma si en la AECN hay rutina libre en tu categoría.</aside>
+    </section>
+
+    <!-- ===================== NATURAL VS ===================== -->
+    <section class="slide" id="natural" data-section="05 · Categorías" aria-label="Natural o con sustancias">
+      <div class="head">
+        <div class="eyebrow in">05 · Dos mundos</div>
+        <h2 class="in" style="--d:.1s">Natural o con sustancias</h2>
+      </div>
+      <div class="vs">
+        <div class="card in" style="--d:.2s">
+          <span class="tag">Federaciones naturales · ej. AECN</span>
+          <h3 class="gold">Culturismo natural</h3>
+          <ul>
+            <li>Controles antidopaje para poder competir.</li>
+            <li>Progreso más lento: años para cada kilo de músculo.</li>
+            <li>Físicos impresionantes, pero alcanzables.</li>
+            <li>Aquí es donde he competido yo.</li>
+          </ul>
+          <figure class="vs-img" style="--pos:50% 45%"><img src="fotos/vs-natural.webp" alt="Fruta variada: plátanos, uvas, kiwi, mango y fresas"></figure>
+        </div>
+        <div class="vs-mid in" style="--d:.35s">VS</div>
+        <div class="card b in" style="--d:.5s">
+          <span class="tag">Ligas profesionales · ej. Mr. Olympia</span>
+          <h3>Culturismo "abierto"</h3>
+          <ul>
+            <li>Sin controles antidopaje en la práctica.</li>
+            <li>Esteroides, hormona del crecimiento, insulina…</li>
+            <li>Físicos extremos, imposibles sin fármacos.</li>
+            <li>Es el que sale en redes y en las películas.</li>
+          </ul>
+          <figure class="vs-img" style="--pos:50% 40%"><img src="fotos/vs-jeringuilla.jpg" alt="Jeringuilla con aguja"></figure>
+        </div>
+      </div>      <aside class="notes">⏱ 20:30 · Explica cómo son los controles en la AECN [CONFIRMA: análisis de orina, polígrafo, etc.]. Deja claro que no juzgas, solo explicas: a continuación verás las categorías del culturismo profesional y, al final, sus riesgos.</aside>
+    </section>
+
+    <!-- ===================== 05 · CATEGORÍAS ===================== -->
+    <section class="slide" id="categorias" data-section="05 · Categorías" data-steps="9" aria-label="Categorías del culturismo profesional">
+      <div class="head-row">
+        <div class="head">
+          <div class="eyebrow in">05 · El culturismo profesional</div>
+          <h2 class="in" style="--d:.1s">Las categorías</h2>
+        </div>
+        <div class="tabs in" style="--d:.2s" role="group" aria-label="Elegir grupo">
+          <button type="button" class="chip" id="tabM" aria-pressed="true">Hombres</button>
+          <button type="button" class="chip" id="tabW" aria-pressed="false">Mujeres</button>
+        </div>
+      </div>
+      <div class="scale in" style="--d:.25s">
+        <div class="markers" id="catMarkers"></div>
+        <div class="scale-line"></div>
+        <div class="scale-ends"><span>← Menos músculo</span><span>Más músculo →</span></div>
+      </div>
+      <div class="cat-detail in" style="--d:.35s">
+        <figure class="ph cat-photo"><img id="catImg" alt="" src="fotos/cat-physique.jpg" hidden><figcaption><b>Foto</b><span id="catPh"></span></figcaption></figure>
+        <div class="cat-body">
+          <div class="cat-name" id="catName"></div>
+          <div class="cat-cols">
+            <div><span class="lbl">Qué se premia</span><p id="catWhat"></p></div>
+            <div><span class="lbl">Vestimenta</span><p id="catWear"></p></div>
+            <div><span class="lbl">Su referente</span><p id="catRep"></p></div>
+          </div>
+        </div>
+        <div class="fx-body" id="catFx" hidden>
+          <div class="cat-name">Efectos en mujeres</div>
+          <p>Los anabolizantes derivan de la testosterona, la hormona masculina. En una mujer provocan rasgos propios de un hombre, y algunos no tienen vuelta atrás:</p>
+          <ul class="fx-list">
+            <li>Voz más grave, casi siempre permanente</li>
+            <li>Vello en la cara y el cuerpo</li>
+            <li>Menstruación irregular o que desaparece</li>
+            <li>Acné y caída del pelo</li>
+            <li>Rasgos más marcados y cambios en los genitales</li>
+            <li>Los mismos riesgos de corazón e hígado que en los hombres</li>
+          </ul>
+        </div>
+      </div>
+      <p class="src" id="catCredit"></p>
+      <aside class="notes">⏱ 21:30 · Cada clic pasa a la siguiente categoría (primero hombres, luego mujeres); también puedes tocar los círculos o las pestañas. El tamaño del círculo indica cuánto músculo se busca. Cada categoría muestra a su referente más conocido con su foto. Tras Ms. Olympia, un clic más muestra los efectos de los anabolizantes en mujeres con una foto de Iris Kyle entrenando: habla de los efectos en general, sin atribuir su uso a ninguna atleta concreta. Datos extra por si te preguntan: en 212 el récord es de Flex Lewis (7 títulos, 2012–2018) y Ángel Calderón se perdió el Olympia 2025 por una lesión de tríceps; en Open el récord es de 8 títulos (Lee Haney y Ronnie Coleman) y Nick Walker ganó en 2026 por delante de Samson Dauda y Derek Lunsford; Men's Physique llegó al Olympia en 2013; Wellness en 2021; Bikini suele ser la categoría con más participantes; Figure se juzga con giros de cuarto, sin poses de fuerza; Women's Physique posa parecido al culturismo masculino. Las federaciones naturales como la AECN tienen categorías parecidas. Cierra con: "de todas ellas, la mía es Classic; os enseño cómo se posa".</aside>
+    </section>
+
+    <!-- ===================== POSES DE CLASSIC ===================== -->
+    <section class="slide" id="poses" data-section="05 · Categorías" aria-label="Las poses obligatorias de Classic">
+      <div class="head">
+        <div class="eyebrow in">05 · Mi categoría: Men's Classic</div>
+        <h2 class="in" style="--d:.1s">Las poses de Classic</h2>
+      </div>
+      <div class="poses" data-sync="1">
+        <div class="pose in" style="--d:.2s"><figure class="ph"><img src="fotos/pose-1.png" alt="Doble bíceps de frente" onerror="this.remove()"><figcaption><b>Foto</b>pose-1.png</figcaption></figure><b>Doble bíceps de frente</b></div>
+        <div class="pose in" style="--d:.28s"><figure class="ph"><img src="fotos/pose-2.png" alt="Perfil caja torácica" onerror="this.remove()"><figcaption><b>Foto</b>pose-2.png</figcaption></figure><b>Perfil caja torácica</b></div>
+        <div class="pose in" style="--d:.36s"><figure class="ph"><img src="fotos/pose-3.png" alt="Doble bíceps de espalda" onerror="this.remove()"><figcaption><b>Foto</b>pose-3.png</figcaption></figure><b>Doble bíceps de espalda</b></div>
+        <div class="pose in" style="--d:.44s"><figure class="ph"><img src="fotos/pose-4.png" alt="Abdominales y pierna" onerror="this.remove()"><figcaption><b>Foto</b>pose-4.png</figcaption></figure><b>Abdominales y pierna</b></div>
+        <div class="pose in" style="--d:.52s"><figure class="ph"><img src="fotos/pose-5.png" alt="Most muscular" onerror="this.remove()"><figcaption><b>Foto</b>pose-5.png</figcaption></figure><b>Most muscular</b></div>
+      </div>
+      <aside class="notes">⏱ 23:30 · Las cinco poses aparecen a la vez. Si te atreves, haz alguna en directo: funciona muy bien. Comprueba que las poses coinciden con las de AECN Men's Classic [CONFIRMA]. Cuenta que mantener una pose en tensión cansa muchísimo y se ensaya a diario. Enlaza con tu caso: "y así me fue a mí".</aside>
+    </section>
+
+    <!-- ===================== 06 · MI CAMINO ===================== -->
+    <section class="slide" id="camino" data-section="06 · Mi caso" aria-label="Mi camino">
+      <div class="head">
+        <div class="eyebrow in">06 · Mi caso</div>
+        <h2 class="in" style="--d:.1s">Mi camino</h2>
+      </div>
+      <p class="in" style="--d:.2s;font-size:34px;margin-top:-16px"><b class="gold" style="font-family:var(--f-display);font-size:48px;font-weight:900;margin-right:12px">2016</b>El Adrián de 19 años</p>
+      <div class="cam-photos">
+        <figure class="ph in" style="--d:.3s"><img src="fotos/adri-2016.jpg" alt="Adrián con un amigo en 2016" style="object-position:50% 22%" onerror="this.remove()"><figcaption><b>Foto</b>adri-2016.jpg</figcaption></figure>
+        <figure class="ph in" style="--d:.4s"><img src="fotos/adri-2016-futbol.png" alt="Adrián con su equipo de fútbol en 2016" style="object-position:50% 0%" onerror="this.remove()"><figcaption><b>Foto</b>adri-2016-futbol.png</figcaption></figure>
+      </div>
+      <aside class="notes">⏱ 24:30 · Tu historia en primera persona. Qué te llevó a competir, qué cambió entre 2023 y 2025 [TU HISTORIA].</aside>
+    </section>
+
+    <!-- ===================== ANTES / DESPUÉS ===================== -->
+    <section class="slide" id="cambio" data-section="06 · Mi caso" aria-label="Antes y después">
+      <div class="head">
+        <div class="eyebrow in">06 · Mi caso</div>
+        <h2 class="in" style="--d:.1s">El cambio</h2>
+      </div>
+      <div class="compare-wrap">
+        <div class="pair">
+          <figure class="ph in" style="--d:.2s"><img src="fotos/adri-2016-antes.png" alt="Adrián en 2016" style="object-position:50% 0%" onerror="this.remove()"><figcaption><b>Foto</b>adri-2016-antes.png</figcaption><span class="tagL">2016</span></figure>
+          <figure class="ph in" style="--d:.45s"><img src="fotos/pose-5.png" alt="Adrián haciendo la pose most muscular" style="object-position:50% 25%" onerror="this.remove()"><figcaption><b>Foto</b>pose-5.png</figcaption><span class="tagR">HOY</span></figure>
+        </div>
+        <div class="kilos">
+          <div class="kg-stop in" style="--d:.3s"><b>72 kg</b><span>Antes · 2016</span></div>
+          <div class="kg-delta up in" style="--d:.5s">+23 kg en la fase de volumen</div>
+          <div class="kg-stop in" style="--d:.7s"><b class="bronze">95 kg</b><span>Después · final del volumen</span></div>
+          <div class="kg-delta down in" style="--d:.9s">−17 kg en 20 semanas de definición</div>
+          <div class="kg-stop in" style="--d:1.1s"><b class="gold">78 kg</b><span>En tarima</span></div>
+          <div class="kg-steps in" style="--d:1.3s"><b>12.000–15.000</b><span>pasos al día durante esas 20 semanas</span></div>
+        </div>
+      </div>
+      <aside class="notes">⏱ 25:30 · Izquierda: 2016, con 19 años y 72 kg. Derecha: hoy, en most muscular. Volumen hasta 95 kg (+23) y luego 20 semanas de definición hasta 78 kg en tarima (−17), con 12.000–15.000 pasos al día. Si quieres, conecta con la calculadora de definición del bloque 3: "¿os acordáis de la calculadora? Esto es lo que salió en mi caso".</aside>
+    </section>
+
+    <!-- ===================== 07 · CURIOSIDADES ===================== -->
+    <section class="slide" id="curiosidades" data-section="07 · Curiosidades y riesgos" data-steps="6" aria-label="Curiosidades">
+      <div class="head">
+        <div class="eyebrow in">07 · ¿Sabías que…?</div>
+        <h2 class="in" style="--d:.1s">Curiosidades</h2>
+      </div>
+      <div class="flips">
+        <button type="button" class="flip in" style="--d:.15s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>El único deporte en el que el día de la competición no haces lo que entrenas</b></div><div class="face back"><p>Meses levantando peso para, al final, subir a la tarima y no levantar ni un kilo. Solo posar.</p></div></div></button>
+        <button type="button" class="flip in" style="--d:.22s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>¿Por qué tan morenos?</b></div><div class="face back"><p>Los focos son tan potentes que la piel clara se ve plana. El tinte oscuro crea sombras y deja ver cada separación.</p></div></div></button>
+        <button type="button" class="flip in" style="--d:.29s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>Comer dulces justo antes de salir</b></div><div class="face back"><p>Algo de azúcar y sal en el backstage ayuda a que el músculo se vea más lleno y con las venas marcadas.</p></div></div></button>
+        <button type="button" class="flip in" style="--d:.36s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>Posar cansa más de lo que parece</b></div><div class="face back"><p>Mantener todo el cuerpo en tensión durante minutos agota. Las poses se ensayan a diario durante semanas.</p></div></div></button>
+        <button type="button" class="flip in" style="--d:.43s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>La báscula de cocina, siempre en la mochila</b></div><div class="face back"><p>En preparación se pesa casi todo lo que se come, al gramo. Comer fuera se convierte en un reto.</p></div></div></button>
+        <button type="button" class="flip in" style="--d:.5s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>El día de tarima no es tu día más sano</b></div><div class="face back"><p>Grasa mínima, poca agua y muchas semanas de hambre: el físico de competición dura unos días y no se puede mantener.</p></div></div></button>
+      </div>
+      <aside class="notes">⏱ 26:30 · Cada clic gira una tarjeta (o tócalas en el orden que quieras). Antes de girar, pregunta al público "¿por qué creéis?". La última enlaza con los riesgos.</aside>
+    </section>
+
+    <!-- ===================== RIESGOS ===================== -->
+    <section class="slide" id="riesgos" data-section="07 · Curiosidades y riesgos" data-steps="1" aria-label="Riesgos">
+      <div class="head">
+        <div class="eyebrow in">07 · Riesgos</div>
+        <h2 class="in" style="--d:.1s">El precio de llevarlo al extremo</h2>
+      </div>
+      <div class="risk fill">
+        <div class="card in" style="--d:.2s"><h3 class="bronze">Fármacos</h3>
+          <ul><li>Esteroides anabolizantes: corazón agrandado, tensión alta, problemas hormonales y de fertilidad.</li><li>Hormona del crecimiento e insulina: riesgo metabólico y de hipoglucemia.</li><li>Diuréticos: deshidratación y alteración de las sales del cuerpo.</li></ul></div>
+        <div class="card in" style="--d:.3s"><h3 class="water-c">En la tarima</h3>
+          <ul><li>Deshidratación severa por cortar agua y usar diuréticos.</li><li>Bajadas de tensión, calambres y desmayos en pleno escenario.</li><li>Un estudio con atletas de físico encontró deshidratación significativa o severa el día de competir.</li></ul></div>
+      </div>
+      <div class="memorial" data-step="1">
+        <span class="lbl">Casos<br>conocidos</span>
+        <div><b>M. Benaziza · 1992</b><span>Murió tras competir; se atribuye a los diuréticos.</span></div>
+        <div><b>A. Münzer · 1996</b><span>Fallo multiorgánico a los 31 años.</span></div>
+        <div><b>S. Rhoden · 2021</b><span>Mr. Olympia 2018; infarto a los 46 años.</span></div>
+      </div>
+      <aside class="notes">⏱ 27:30 · Tono serio, sin morbo. Clic para mostrar los casos. Münzer: la autopsia habló de fallo multiorgánico y se encontraron restos de unas 20 sustancias. Recalca que en el culturismo natural estos riesgos son mucho menores, pero la deshidratación de la peak week afecta a todos.</aside>
+    </section>
+
+    <!-- ===================== CORAZÓN ===================== -->
+    <section class="slide" id="corazon" data-section="07 · Curiosidades y riesgos" data-steps="1" aria-label="El corazón de un culturista">
+      <div class="head">
+        <div class="eyebrow in">07 · Órganos</div>
+        <h2 class="in" style="--d:.1s">El corazón de un culturista</h2>
+      </div>
+      <div class="heart-wrap">
+        <div class="hcol in" style="--d:.2s">
+          <svg viewBox="-130 -110 260 190" aria-hidden="true"><path class="heart" d="M0 70 C-100 10 -125 -55 -70 -88 C-38 -106 -10 -88 0 -62 C10 -88 38 -106 70 -88 C125 -55 100 10 0 70 Z" fill="#a8998a"/></svg>
+          <b>332 g</b><span>Hombre de referencia</span>
+        </div>
+        <div class="hcol in" style="--d:.3s">
+          <svg viewBox="-130 -110 260 190" aria-hidden="true"><path class="heart big" d="M0 70 C-100 10 -125 -55 -70 -88 C-38 -106 -10 -88 0 -62 C10 -88 38 -106 70 -88 C125 -55 100 10 0 70 Z" fill="#b2603f"/></svg>
+          <b class="bronze">575 g</b><span>Media en autopsias<br>de culturistas</span>
+        </div>
+        <div class="heart-facts">
+          <div class="card in" style="--d:.4s"><h3 class="gold">+74 %</h3><p>más pesado de media. En todos los casos revisados, la pared del ventrículo izquierdo estaba engrosada.</p></div>
+          <div class="card in" style="--d:.5s"><h3>Más grande no es mejor</h3><p>Una pared más gruesa se vuelve rígida y bombea peor. Influyen los esteroides, la tensión alta y el propio peso corporal.</p></div>
+        </div>
+      </div>      <aside class="notes">⏱ 28:30 · Clic: el corazón crece hasta su tamaño proporcional. Son autopsias de culturistas fallecidos (muchos con esteroides: dos de cada tres casos), no de todos los culturistas. Un corazón normal de deportista también crece algo, pero de forma sana.</aside>
+    </section>
+
+    <!-- ===================== CIERRE ===================== -->
+    <section class="slide" id="cierre" data-section="Cierre" aria-label="Gracias">
+      <div class="beam l" aria-hidden="true"></div>
+      <div class="beam c" aria-hidden="true"></div>
+      <div class="beam r" aria-hidden="true"></div>
+      <div class="cover-top"><div class="eyebrow in">Sobre la tarima</div><span></span></div>
+      <div class="close-mid">
+        <h2 class="title" aria-label="Gracias">
+          <span style="--i:0">G</span><span style="--i:1">R</span><span style="--i:2">A</span><span style="--i:3">C</span><span style="--i:4">I</span><span style="--i:5">A</span><span style="--i:6">S</span>
+        </h2>
+        <p class="close-q in" style="--d:1.2s">¿Preguntas?</p>
+      </div>
+      <div class="cover-bottom">
+        <div class="who in" style="--d:1.4s"><b>Adrián Casas Cuartero</b><a class="ig" href="https://www.instagram.com/adri_casas_97/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.1" class="dot"/></svg>@adri_casas_97</a></div>
+        <div class="badges in" style="--d:1.6s"><span class="badge win">Men's Classic · AECN 2025</span></div>
+      </div>
+      <aside class="notes">⏱ 30:00 · Cierre y turno de preguntas. Si sobra tiempo: quiz corto (pendiente de preparar).</aside>
+    </section>
+
+  </div>
+</div>
+
+<div class="progress" id="progress"></div>
+<div class="hud" id="hud">
+  <span class="sec" id="hudSec"></span>
+  <div class="ctrls">
+    <button type="button" id="bPrev" aria-label="Anterior">←</button>
+    <span class="count" id="hudCount"></span>
+    <button type="button" id="bNext" aria-label="Siguiente">→</button>
+    <button type="button" id="bNotes" aria-label="Notas del orador">Notas</button>
+    <button type="button" id="bFull" aria-label="Pantalla completa">⛶</button>
+    <button type="button" id="bHelp" aria-label="Atajos de teclado">?</button>
+  </div>
+</div>
+<div class="notes-panel" id="notesPanel" hidden>
+  <header><span>Notas del orador</span><span id="timer">00:00</span></header>
+  <div id="notesText"></div>
+</div>
+<div class="help" id="help" hidden>
+  <div>
+    <h4>Controles</h4>
+    <kbd>→</kbd> <kbd>Espacio</kbd> <kbd>AvPág</kbd> siguiente<br>
+    <kbd>←</kbd> <kbd>RePág</kbd> anterior<br>
+    <kbd>Clic izq.</kbd> siguiente · <kbd>Clic der.</kbd> anterior<br>
+    <kbd>F</kbd> pantalla completa · <kbd>N</kbd> notas<br>
+    <kbd>B</kbd> pantalla en negro · <kbd>Inicio</kbd> / <kbd>Fin</kbd><br>
+    <span class="muted">Funciona con mandos de presentación. Pulsa cualquier tecla para cerrar.</span>
+  </div>
+</div>
+<div class="blackout" id="blackout" hidden></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const deck = $('#deck');
+  const slides = [...deck.querySelectorAll('.slide')];
+  let cur = -1, step = 0, t0 = null;
+  const fmt = n => n.toLocaleString('es-ES');
+  const dec = (n, d = 1) => n.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  /* ---- escalado del lienzo 1920×1080 ---- */
+  const fit = () => deck.style.setProperty('--k', Math.min(innerWidth / 1920, innerHeight / 1080));
+  addEventListener('resize', fit); fit();
+
+  /* ---- reanimar un bloque al cambiar su contenido ---- */
+  const bump = (...els) => els.forEach(e => { e.classList.remove('cat-anim'); void e.offsetWidth; e.classList.add('cat-anim'); });
+
+  /* ---- contador animado ---- */
+  const rafs = {};
+  function countTo(el, to, dur = 1800, fmtFn = fmt) {
+    cancelAnimationFrame(rafs[el.id]);
+    const start = performance.now();
+    const tick = now => {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = fmtFn(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) rafs[el.id] = requestAnimationFrame(tick);
+    };
+    rafs[el.id] = requestAnimationFrame(tick);
+  }
+
+  /* ---- ganchos por diapositiva ---- */
+  const hooks = {
+    agua(s) {
+      const el = $('#litersNum');
+      if (s < 2) { cancelAnimationFrame(rafs.litersNum); el.textContent = '0'; return; }
+      if (el.textContent !== '10') countTo(el, 10, 2000, String);
+    },
+    pasos(s, el, entered) { if (entered) countTo($('#pasosNum'), 12000, 2200); },
+    enfoque(s) { showZone(s); },
+    categorias(s) { showCat(s); },
+    curiosidades(s, el) {
+      el.querySelectorAll('.flip').forEach((f, i) => f.classList.toggle('flipped', i < s));
+    },
+    peak(s) { $('#tank').dataset.st = s; }
+  };
+
+  /* listas sincronizadas con los pasos */
+  function syncLists(el) {
+    el.querySelectorAll('[data-sync]').forEach(list => {
+      const idx = step - (+list.dataset.sync || 0);
+      [...list.children].forEach((c, i) => { c.classList.toggle('now', i === idx); c.classList.toggle('done', i < idx); });
+      list.classList.toggle('focus', idx >= 0 && idx < list.children.length);
+    });
+  }
+
+  /* ---- motor de diapositivas ---- */
+  const maxStep = el => +(el.dataset.steps || 0);
+  function setStep(s, entered = false) {
+    const el = slides[cur], max = maxStep(el);
+    step = Math.max(0, Math.min(max, s));
+    for (let n = 1; n <= max; n++) el.classList.toggle('at-' + n, step >= n);
+    el.querySelectorAll('[data-step]').forEach(x => x.classList.toggle('on', +x.dataset.step <= step));
+    syncLists(el);
+    hooks[el.id]?.(step, el, entered);
+    hud();
+  }
+  function go(i, s = 0) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    const entered = i !== cur;
+    if (entered) {
+      slides.forEach((el, j) => {
+        el.classList.toggle('active', j === i);
+        el.classList.toggle('past', j < i);
+        el.setAttribute('aria-hidden', j === i ? 'false' : 'true');
+        el.inert = j !== i;
+      });
+      cur = i;
+      try { history.replaceState(null, '', '#s' + (i + 1)); } catch (e) {}
+    }
+    setStep(s === 'end' ? maxStep(slides[i]) : s, entered);
+  }
+  const next = () => {
+    if (t0 === null) t0 = Date.now();
+    step < maxStep(slides[cur]) ? setStep(step + 1) : (cur < slides.length - 1 && go(cur + 1));
+  };
+  const prev = () => step > 0 ? setStep(step - 1) : (cur > 0 && go(cur - 1, 'end'));
+
+  /* ---- HUD, notas y temporizador ---- */
+  function hud() {
+    const el = slides[cur];
+    $('#hudSec').textContent = el.dataset.section || '';
+    $('#hudCount').textContent = (cur + 1) + ' / ' + slides.length;
+    const maxS = maxStep(el);
+    const frac = (cur + (maxS ? step / (maxS + 1) : 0)) / Math.max(1, slides.length - 1);
+    $('#progress').style.transform = 'scaleX(' + Math.min(1, frac) + ')';    $('#notesText').textContent = el.querySelector('.notes')?.textContent.trim() || 'Sin notas.';
+  }
+  setInterval(() => {
+    if (t0 === null) return;
+    const s = Math.floor((Date.now() - t0) / 1000);
+    $('#timer').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }, 1000);
+
+  const hudEl = $('#hud'); let hideT;
+  addEventListener('mousemove', () => { hudEl.classList.add('show'); clearTimeout(hideT); hideT = setTimeout(() => hudEl.classList.remove('show'), 2500); });
+
+  const toggleFull = () => {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      else document.documentElement.requestFullscreen?.()?.catch?.(() => {});
+    } catch (e) {}
+  };
+  const toggle = id => { const el = $(id); el.hidden = !el.hidden; };
+  $('#bPrev').onclick = prev;
+  $('#bNext').onclick = next;
+  $('#bNotes').onclick = () => toggle('#notesPanel');
+  $('#bFull').onclick = toggleFull;
+  $('#bHelp').onclick = () => toggle('#help');
+
+  addEventListener('keydown', e => {
+    if (!$('#help').hidden) { $('#help').hidden = true; e.preventDefault(); return; }
+    if (!$('#blackout').hidden && !['b', 'B', '.'].includes(e.key)) { $('#blackout').hidden = true; return; }
+    const inField = e.target.matches?.('input, textarea, select');
+    if (inField && !['PageDown', 'PageUp', 'Escape'].includes(e.key)) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': e.preventDefault(); prev(); break;
+      case 'Home': go(0); break;
+      case 'End': go(slides.length - 1, 'end'); break;
+      case 'f': case 'F': toggleFull(); break;
+      case 'n': case 'N': toggle('#notesPanel'); break;
+      case 'b': case 'B': case '.': toggle('#blackout'); break;
+      case '?': toggle('#help'); break;
+      case 'Escape': if (inField) e.target.blur(); break;
+    }
+  });
+
+  /* clic izquierdo = siguiente, clic derecho = anterior (salvo en zonas clicables) */
+  const clickable = 'a, button, input, select, textarea, label, .flip, .hot, .chip, .mk, .hud, .notes-panel, .ctl, .presets';
+  addEventListener('click', e => {
+    if (e.button !== 0) return;
+    if (!$('#help').hidden) { $('#help').hidden = true; return; }
+    if (!$('#blackout').hidden) { $('#blackout').hidden = true; return; }
+    if (e.target.closest(clickable)) return;
+    if (String(window.getSelection?.() || '').length) return;
+    next();
+  });
+  addEventListener('contextmenu', e => {
+    if (e.target.closest('input, textarea, select')) return;
+    e.preventDefault();
+    if (!$('#help').hidden || !$('#blackout').hidden) return;
+    prev();
+  });
+
+  let tx = null;
+  addEventListener('touchstart', e => { if (!e.target.closest('input, .flip, .hot, .chip, .mk')) tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+
+  /* ---- balanza ---- */
+  const kIn = $('#kIn'), kOut = $('#kOut');
+  const PX = 410, PY = 190, L = 280;
+  function balance() {
+    const a = +kIn.value, b = +kOut.value, d = a - b;
+    $('#oIn').textContent = fmt(a) + ' kcal';
+    $('#oOut').textContent = fmt(b) + ' kcal';
+    $('#valL').textContent = fmt(a);
+    $('#valR').textContent = fmt(b);
+    const ang = Math.max(-14, Math.min(14, d / 1200 * 14)) * Math.PI / 180;
+    const lx = PX - L * Math.cos(ang), ly = PY + L * Math.sin(ang);
+    const rx = PX + L * Math.cos(ang), ry = PY - L * Math.sin(ang);
+    const beam = $('#beam');
+    beam.setAttribute('x1', lx.toFixed(1)); beam.setAttribute('y1', ly.toFixed(1));
+    beam.setAttribute('x2', rx.toFixed(1)); beam.setAttribute('y2', ry.toFixed(1));
+    $('#panL').setAttribute('transform', `translate(${lx.toFixed(1)} ${ly.toFixed(1)})`);
+    $('#panR').setAttribute('transform', `translate(${rx.toFixed(1)} ${ry.toFixed(1)})`);
+    const v = $('#verdict'), kg = d * 30 / 7700;
+    const kgTxt = (kg > 0.04 ? '+' : kg < -0.04 ? '−' : '') + dec(Math.abs(kg));
+    if (d > 100) { v.dataset.s = 'sup'; $('#vState').textContent = 'Superávit'; $('#vPhase').textContent = 'Fase de volumen: subes de peso para construir músculo.'; }
+    else if (d < -100) { v.dataset.s = 'def'; $('#vState').textContent = 'Déficit'; $('#vPhase').textContent = 'Fase de definición: bajas de peso, sobre todo grasa.'; }
+    else { v.dataset.s = 'man'; $('#vState').textContent = 'Mantenimiento'; $('#vPhase').textContent = 'Tu peso se queda donde está.'; }
+    $('#vKg').textContent = '≈ ' + kgTxt + ' kg al mes (estimación)';
+  }
+  kIn.addEventListener('input', balance);
+  kOut.addEventListener('input', balance);
+  document.querySelectorAll('#balanza .presets .chip').forEach(b => b.addEventListener('click', () => {
+    kIn.value = b.dataset.in; kOut.value = b.dataset.out; balance(); b.blur();
+  }));
+  balance();
+
+  /* ---- muro de ladrillos ---- */
+  (() => {
+    const wall = $('#wall'), rows = 7, cols = 7;
+    for (let r = 0; r < rows; r++) {
+      const row = document.createElement('div'); row.className = 'row';
+      for (let c = 0; c < cols; c++) {
+        const b = document.createElement('span');
+        b.className = 'brick' + (r >= rows - 2 ? ' new' : '');
+        b.style.setProperty('--i', r * cols + c);
+        row.appendChild(b);
+      }
+      wall.appendChild(row);
+    }
+  })();
+
+  /* ---- calculadora de definición ---- */
+  const dW0 = $('#dW0'), dW1 = $('#dW1'), dR = $('#dR');
+  function defCalc() {
+    let w0 = +dW0.value, w1 = +dW1.value; const r = +dR.value / 100;
+    if (w1 > w0 - 1) { w1 = w0 - 1; dW1.value = w1; }
+    const pts = [w0]; let w = w0;
+    while (w > w1 && pts.length < 120) { w *= 1 - r; pts.push(Math.max(w, w1)); }
+    const weeks = pts.length - 1, months = weeks / 4.345;
+    $('#oW0').textContent = dec(w0, w0 % 1 ? 1 : 0) + ' kg';
+    $('#oW1').textContent = dec(w1, w1 % 1 ? 1 : 0) + ' kg';
+    $('#oR').textContent = dec(r * 100) + ' %';
+    $('#dWeeks').textContent = weeks + ' semanas';
+    $('#dMonths').textContent = '≈ ' + dec(months) + ' meses · −' + dec(w0 * r) + ' kg/semana al inicio';
+    // gráfico
+    const X0 = 90, X1 = 960, Y0 = 50, Y1 = 450;
+    const xmax = Math.max(weeks, 4), ymin = w1 - 2, ymax = w0 + 1;
+    const X = i => X0 + (X1 - X0) * i / xmax, Y = v => Y0 + (Y1 - Y0) * (ymax - v) / (ymax - ymin);
+    let g = `<defs><linearGradient id="defArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#79aee0" stop-opacity=".35"/><stop offset="1" stop-color="#79aee0" stop-opacity="0"/></linearGradient></defs>`;
+    const yStep = Math.max(1, Math.round((ymax - ymin) / 5));
+    for (let v = Math.ceil(ymin); v <= ymax; v += yStep) g += `<line class="c-grid" x1="${X0}" x2="${X1}" y1="${Y(v)}" y2="${Y(v)}"/><text class="c-txt" x="${X0 - 14}" y="${Y(v) + 8}" text-anchor="end">${v}</text>`;
+    g += `<line class="c-axis" x1="${X0}" x2="${X1}" y1="${Y1}" y2="${Y1}"/>`;
+    const line = pts.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+    g += `<polygon class="c-area" points="${X(0)},${Y1} ${line} ${X(weeks)},${Y1}"/>`;
+    g += `<line class="c-target" x1="${X0}" x2="${X1}" y1="${Y(w1)}" y2="${Y(w1)}"/><text class="c-txt hi" x="${X1}" y="${Y(w1) + 34}" text-anchor="end">Peso de tarima</text>`;
+    g += `<polyline class="c-line" points="${line}"/>`;
+    for (let m = 1; m * 4.345 <= weeks + 0.01; m++) {
+      const wk = m * 4.345, i0 = Math.floor(wk), f = wk - i0;
+      const v = pts[i0] + ((pts[i0 + 1] ?? pts[i0]) - pts[i0]) * f;
+      g += `<circle class="c-dot" cx="${X(wk)}" cy="${Y(v)}" r="9"/><text class="c-txt" x="${X(wk)}" y="${Y1 + 34}" text-anchor="middle">Mes ${m}</text>`;
+    }
+    g += `<text class="c-txt w" x="${X(0) + 14}" y="${Y(w0) - 18}">${dec(w0, w0 % 1 ? 1 : 0)} kg</text>`;
+    g += `<text class="c-txt" x="${X0}" y="${Y1 + 34}">Semana 0</text>`;
+    $('#defChart').innerHTML = g;
+  }
+  [dW0, dW1, dR].forEach(i => i.addEventListener('input', defCalc));
+  defCalc();
+
+  /* ---- enfoques musculares ---- */
+  const zones = [
+    ['La silueta en X', 'Toca un punto', 'Cada zona tiene su papel en el físico final. Avanza para recorrerlas.'],
+    ['Hombros', 'Arriba de la X', 'Anchos y redondos. Son lo primero que ensancha la silueta.'],
+    ['Espalda', 'Los dorsales', 'Dan la forma de V, tanto de frente como de espaldas.'],
+    ['Cintura', 'El centro de la X', 'Estrecha y con abdominales marcados. En Classic se presume con el vacío abdominal.'],
+    ['Piernas', 'Abajo de la X', 'Cuádriceps con "barrido" hacia fuera para equilibrar unos hombros anchos.'],
+    ['Gemelos', 'El punto débil clásico', 'Muy difíciles de desarrollar. Si van atrasados, se entrenan casi a diario.']
+  ];
+  function showZone(s) {
+    const z = zones[s] || zones[0];
+    $('#zoneName').textContent = z[0]; $('#zoneLbl').textContent = z[1]; $('#zoneText').textContent = z[2];
+    $('#zoneText').classList.toggle('muted', s === 0);
+    document.querySelectorAll('#enfoque .hot').forEach(h => h.classList.toggle('now', +h.dataset.z === s));
+    bump($('#zoneName'), $('#zoneText'));
+  }
+  document.querySelectorAll('#enfoque .hot').forEach(h => h.addEventListener('click', () => { setStep(+h.dataset.z); h.blur(); }));
+
+  /* ---- categorías ---- */
+  const cats = [
+    { g: 'M', k: 'physique', n: "Men's Physique", sz: 34, p: 12, what: 'La "V" perfecta: hombros anchos, cintura estrecha y abdominales. Las piernas no se juzgan.', wear: 'Bañador largo tipo surf.', rep: 'Jeremy Buendia', repTxt: '4 títulos seguidos (2014–2017)', credit: '' },
+    { g: 'M', k: 'classic', n: 'Classic Physique', sz: 46, p: 38, what: 'La estética de los años 70: proporción, cintura de avispa y poses clásicas. Peso máximo según la altura.', wear: 'Bañador corto tipo bóxer.', rep: 'Chris Bumstead', repTxt: '6 títulos seguidos (2019–2024). Es mi categoría.', credit: '' },
+    { g: 'M', k: '212', n: '212', sz: 58, p: 64, what: 'Culturismo completo con un límite: pesar como máximo 212 libras (unos 96 kg).', wear: 'Slip de competición.', rep: 'Ángel Calderón', repTxt: 'El español mejor situado: subcampeón del 212 Olympia en 2022 y 3.º en 2023 y 2024.', credit: '' },
+    { g: 'M', k: 'open', n: 'Open', sz: 72, p: 89, what: 'Sin límite de peso: la máxima masa muscular posible, con definición y simetría. Su ganador es Mr. Olympia.', wear: 'Slip de competición.', rep: 'Nick Walker', repTxt: 'El actual Mr. Olympia: ganó en 2026, su primer título.', credit: '' },
+    { g: 'W', k: 'bikini', n: 'Bikini', sz: 30, p: 10, what: 'Un físico atlético con poco volumen muscular. Cuenta mucho la presentación y el paseo por la tarima.', wear: 'Bikini y tacones.', rep: 'Ashley Kaltwasser', repTxt: '3 títulos seguidos (2013–2015)', credit: '' },
+    { g: 'W', k: 'wellness', n: 'Wellness', sz: 40, p: 30, what: 'Mucho más desarrollo en el tren inferior: glúteos y piernas grandes, con un torso menos voluminoso.', wear: 'Bikini y tacones.', rep: 'Francielle Mattos', repTxt: 'Ganó las 3 primeras ediciones (2021–2023)', credit: '' },
+    { g: 'W', k: 'figure', n: 'Figure', sz: 50, p: 50, what: 'La "V" femenina: espalda y hombros anchos con cintura estrecha. Más músculo que bikini.', wear: 'Bañador de dos piezas y tacones.', rep: 'Cydney Gillon', repTxt: '8 títulos seguidos (2017–2024), récord', credit: '' },
+    { g: 'W', k: 'wphysique', n: "Women's Physique", sz: 60, p: 70, what: 'Musculatura desarrollada y muy definida, sin llegar a la masa del culturismo.', wear: 'Bañador de dos piezas, descalzas.', rep: 'Juliana Malacarne', repTxt: '4 títulos seguidos (2014–2017)', credit: '' },
+    { g: 'W', k: 'msolympia', n: 'Ms. Olympia', sz: 72, p: 90, what: 'El culturismo femenino: la máxima masa muscular con definición.', wear: 'Bañador de dos piezas, descalzas.', rep: 'Iris Kyle', repTxt: '10 títulos, el récord absoluto', ext: 'webp', credit: '' }
+  ];
+  let catGroup = null;
+  function showCat(s) {
+    const fx = s >= cats.length;            // paso extra: efectos en mujeres (dentro de Ms. Olympia)
+    if (fx) s = cats.length - 1;
+    const c = cats[s];
+    if (c.g !== catGroup) {
+      catGroup = c.g;
+      $('#tabM').setAttribute('aria-pressed', c.g === 'M'); $('#tabW').setAttribute('aria-pressed', c.g === 'W');
+      $('#catMarkers').innerHTML = cats.map((k, i) => k.g === c.g
+        ? `<button type="button" class="mk" data-i="${i}" style="left:${k.p}%;--sz:${k.sz}"><span>${k.n}</span><i></i></button>` : '').join('');
+      $('#catMarkers').querySelectorAll('.mk').forEach(m => m.addEventListener('click', () => { setStep(+m.dataset.i); m.blur(); }));
+    }
+    $('#catMarkers').querySelectorAll('.mk').forEach(m => m.classList.toggle('sel', +m.dataset.i === s));
+    $('#catName').textContent = c.n; $('#catWhat').textContent = c.what; $('#catWear').textContent = c.wear;
+    $('#catRep').innerHTML = `<b>${c.rep}</b>${c.repTxt}`;
+    const img = $('#catImg');
+    img.hidden = false; img.alt = c.rep; img.onerror = () => { img.hidden = true; };
+    const file = fx ? 'cat-msolympia-gym.jpg' : 'cat-' + c.k + '.' + (c.ext || 'jpg');
+    img.src = 'fotos/' + file;
+    img.alt = fx ? 'Iris Kyle entrenando en el gimnasio' : c.rep;
+    $('#catPh').textContent = c.rep + ' · ' + file;
+    $('#catCredit').textContent = c.credit;
+    $('#categorias .cat-body').hidden = fx;
+    $('#catFx').hidden = !fx;
+    bump($(fx ? '#catFx' : '#categorias .cat-body'), $('#categorias .cat-photo'));
+  }
+  $('#tabM').addEventListener('click', e => { setStep(0); e.currentTarget.blur(); });
+  $('#tabW').addEventListener('click', e => { setStep(4); e.currentTarget.blur(); });
+
+  /* ---- curiosidades: girar al tocar ---- */
+  document.querySelectorAll('.flip').forEach(f => f.addEventListener('click', () => { f.classList.toggle('flipped'); f.blur(); }));
+
+  /* ---- antes / después ---- */
+  $('#cmp')?.addEventListener('input', e => $('#compare').style.setProperty('--x', e.target.value + '%'));
+
+  /* ---- arranque ---- */
+  const fromHash = () => { const m = /^#s(\d+)$/.exec(location.hash); return m ? +m[1] - 1 : 0; };
+  addEventListener('hashchange', () => { const i = fromHash(); if (i !== cur) go(i); });
+  go(fromHash());
+})();
+</script>
