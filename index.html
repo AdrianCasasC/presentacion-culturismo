@@ -47,7 +47,6 @@ button{font:inherit;color:inherit}
   transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s linear .9s}
 .slide.past{transform:translateX(-70px)}
 .slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s}
-.slide .notes{display:none}
 
 /* Entrada escalonada de elementos cada vez que la diapositiva se activa */
 @keyframes rise{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
@@ -159,8 +158,8 @@ p,li{font-size:32px;line-height:1.4}
   transition:opacity .6s var(--ease),border-color .6s,background .6s,transform .6s var(--ease)}
 .opt .k{font-family:var(--f-display);font-weight:900;font-size:66px;line-height:1;color:var(--bronze);width:46px}
 .opt .v{font-family:var(--f-display);font-weight:800;font-size:58px;line-height:1;text-transform:uppercase}
-#agua.at-1 .opt:not(.correct){opacity:.28;transform:scale(.96)}
-#agua.at-1 .opt.correct{border-color:var(--gold);background:linear-gradient(160deg,rgba(242,197,97,.18),rgba(242,197,97,.04));transform:translateY(-8px)}
+#agua.at-1 .opt:not(.correct){opacity:.28!important;transform:scale(.96)!important}
+#agua.at-1 .opt.correct{border-color:var(--gold);background:linear-gradient(160deg,rgba(242,197,97,.18),rgba(242,197,97,.04));transform:translateY(-8px)!important}
 #agua.at-1 .opt.correct .k{color:var(--gold)}
 .opt .tick{position:absolute;right:-18px;top:-18px;width:50px;height:50px;border-radius:50%;background:var(--gold);color:var(--stage);
   display:grid;place-items:center;font-weight:700;font-size:30px;opacity:0;transform:scale(.3);transition:.5s var(--ease) .2s}
@@ -171,7 +170,9 @@ p,li{font-size:32px;line-height:1.4}
 .bottles{display:flex;gap:26px;align-items:flex-end}
 .bottle{position:relative;width:76px;height:170px;border:3px solid rgba(121,174,224,.55);border-radius:22px 22px 18px 18px;overflow:hidden;background:rgba(121,174,224,.05)}
 .bottle i{position:absolute;inset:0;background:linear-gradient(to top,#3f78b3,var(--water));transform:scaleY(0);transform-origin:bottom;transition:transform .7s var(--ease);transition-delay:calc(var(--i) * .16s)}
-#agua.at-2 .bottle i{transform:none}
+#agua.at-1 .bottle i{transform:none}
+#agua .water{transition-delay:.35s}
+#agua .teaser{transition-delay:1.5s}
 .teaser{font-family:var(--f-display);font-weight:800;font-size:56px;text-transform:uppercase;color:var(--bronze)}
 
 /* ---------- Historia ---------- */
@@ -418,6 +419,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
 #saciantes.at-1 .disc{transform:scale(1)}
 .grams{font-family:var(--f-display);font-weight:900;font-size:76px;line-height:1;color:var(--gold);opacity:0;transition:opacity .6s .5s}
 #saciantes.at-1 .grams{opacity:1}
+#saciantes .analogy{transition-delay:.9s}
 
 /* ---------- Mente ---------- */
 .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1;min-height:0}
@@ -595,10 +597,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
 .hud button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .hud .count{font-variant-numeric:tabular-nums;padding:0 6px}
 
-.notes-panel{position:fixed;left:max(16px, env(safe-area-inset-left, 0px));right:max(16px, env(safe-area-inset-right, 0px));bottom:70px;max-width:900px;margin:0 auto;
-  background:rgba(29,24,20,.96);border:1px solid var(--line);border-radius:16px;padding:18px 22px;z-index:7;
-  font-size:16px;line-height:1.5;color:var(--chalk);box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.notes-panel header{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px}
 .help{position:fixed;inset:0;display:grid;place-items:center;background:rgba(18,15,12,.85);z-index:8;padding:16px}
 .help div{background:var(--stage-2);border:1px solid var(--line);border-radius:18px;padding:26px 30px;max-width:460px;width:100%;font-size:15px;line-height:1.9}
 .help kbd{font-family:var(--f-mono);font-size:13px;background:var(--stage-3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--gold)}
@@ -638,7 +636,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <span class="badge win">AECN 2025 · 3.º Men's Classic</span>
         </div>
       </div>
-      <aside class="notes">⏱ 0:00 · Preséntate en 20 segundos: 10 años de gimnasio y dos competiciones de culturismo natural en la AECN (2023 y 2025, tercero en Men's Classic). Di que hoy vas a enseñar lo que no se ve de este deporte. Pregunta rápida a mano alzada: ¿quién ha pisado un gimnasio alguna vez?</aside>
     </section>
 
     <!-- ===================== HISTORIA ===================== -->
@@ -654,7 +651,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="tl-item" data-step="3"><span class="y">1977</span><b>Pumping Iron</b><p>Un documental lleva el culturismo al cine y convierte a Arnold Schwarzenegger en estrella.</p><figure class="tl-img" style="--pos:50% 42%"><img src="fotos/hist-pumping.jpg" alt="Cartel de Pumping Iron con Arnold Schwarzenegger"></figure></div>
         <div class="tl-item" data-step="4"><span class="y">Hoy</span><b>Un deporte global</b><p>El Olympia se celebra en Las Vegas, hay decenas de categorías y federaciones naturales con controles antidopaje.</p><figure class="tl-img" style="--pos:50% 6%"><img src="fotos/hist-olympia.jpg" alt="Ronnie Coleman coronado como Mr. Olympia"></figure></div>
       </div>
-      <aside class="notes">⏱ 1:00 · Un clic por hito. No te detengas mucho: 15 segundos por fecha. Sandow actuaba en teatros de variedades exhibiendo su físico.</aside>
     </section>
 
     <!-- ===================== 01 · QUÉ ES ===================== -->
@@ -682,7 +678,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <h3>Presentación</h3><p>Poses, bronceado y cómo te mueves en la tarima.</p>
         </div>
       </div>
-      <aside class="notes">⏱ 2:00 · Mensaje clave: es un deporte estético, como la gimnasia rítmica o el patinaje artístico, pero juzgando el cuerpo. Gana el físico más completo y equilibrado, no necesariamente el más grande. Los jueces comparan en grupos, lado a lado.</aside>
     </section>
 
     <!-- ===================== 02 · FIBRA ===================== -->
@@ -726,7 +721,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         </ol>
       </div>
       <p class="analogy" data-step="3">Como un muro que, cada vez que se agrieta, se repara con más ladrillos de los que tenía.</p>
-      <aside class="notes">⏱ 3:00 · Avanza un clic por fase. Simplificación honesta: el principal motor del crecimiento es la tensión mecánica; el daño acompaña, pero no es el objetivo. Curiosidad: tener agujetas no significa que estés creciendo más. Sin descanso ni proteína no hay paso 3, y sin paso 3 no hay paso 4.</aside>
     </section>
 
     <!-- ===================== SOBRECARGA ===================== -->
@@ -768,7 +762,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <div><b>+</b><span>Mejor técnica y control</span></div>
         </div>
       </div>
-      <aside class="notes">⏱ 4:30 · El músculo se adapta a lo que le pides. Si le pides siempre lo mismo, no tiene por qué crecer. Las cifras del gráfico son un ejemplo. Puedes contar tu progresión en algún ejercicio.</aside>
     </section>
 
     <!-- ===================== TÉCNICA ===================== -->
@@ -783,7 +776,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="card in" style="--d:0.49s"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 32h48"/><path d="M14 22v20M50 22v20M20 26v12M44 26v12"/></svg><div><h3>Recorrido antes que kilos</h3><p>Mover el peso en todo su recorrido. Cargar de más con medio movimiento es "levantar con el ego".</p></div></div>
         <div class="card in" style="--d:0.61s"><svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24"/><path d="M32 18v18M32 44v2"/></svg><div><h3>Escucha al cuerpo</h3><p>Ardor o agujetas en el músculo: normal. Dolor punzante en una articulación: se para.</p></div></div>
       </div>
-      <aside class="notes">⏱ 5:30 · Las cuatro tarjetas aparecen a la vez. La bola amarilla de la segunda tarjeta marca el ritmo: 3 segundos bajando, 1 subiendo. Cuenta alguna lesión o susto tuyo si lo tienes.</aside>
     </section>
 
     <!-- ===================== 03 · BALANZA ===================== -->
@@ -832,7 +824,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           </div>
         </div>
       </div>
-      <aside class="notes">⏱ 6:30 · Mueve el deslizador o pide a alguien del público que diga cuánto cree que come. Tres estados: mantenimiento, superávit (volumen) y déficit (definición). Regla aproximada: 1 kg de grasa ≈ 7.700 kcal. Los botones de abajo ponen ejemplos rápidos.</aside>
     </section>
 
     <!-- ===================== VOLUMEN ===================== -->
@@ -849,7 +840,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <div class="point in" style="--d:.7s"><b class="bronze">Paciencia</b><span>Ocupa la mayor parte del año. En alguien avanzado, cada kilo de músculo cuesta meses.</span></div>
         </div>
       </div>
-      <aside class="notes">⏱ 7:30 · Los ladrillos dorados de arriba son el músculo nuevo. Comer más no significa comer cualquier cosa: un volumen "sucio" acaba en grasa que luego hay que quitar en definición, y eso alarga el déficit. Di cuántos meses de volumen hiciste tú y con cuántas calorías aproximadas [TUS DATOS].</aside>
     </section>
 
     <!-- ===================== DEFINICIÓN (calculadora) ===================== -->
@@ -868,7 +858,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         </div>
       </div>
       <div class="warn in" style="--d:.5s"><b>!</b><p>Más del 1 % semanal se come el músculo. Y con poca comida el cuerpo se recupera peor: en un déficit largo se entrena menos volumen y con más control, porque es más fácil lesionarse.</p></div>
-      <aside class="notes">⏱ 8:30 · Calculadora en directo, ya con tus datos: 95 kg al acabar el volumen, 78 kg en tarima y un 1 % semanal dan 20 semanas, exactamente lo que hiciste. Después puedes mover los deslizadores para enseñar qué pasaría con otro ritmo. La recomendación habitual para naturales es perder entre 0,5 % y 1 % del peso por semana; por eso las definiciones duran 4–6 meses. Pregunta: "¿Quién aguantaría 5 meses a dieta?".</aside>
     </section>
 
     <!-- ===================== 04 · AÑO ===================== -->
@@ -888,7 +877,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="card in" style="--d:0.75s"><span class="lbl" style="color:var(--water)">≈ 16–20 semanas</span><h3 class="water-c">Definición</h3><p>Déficit, más pasos y entrenamiento más controlado. Se quita la grasa que tapa el músculo.</p></div>
         <div class="card in" style="--d:0.90s"><span class="lbl" style="color:var(--gold)">Última semana + después</span><h3 class="gold">Tarima y vuelta</h3><p>Peak week, competición y una subida de comida gradual.</p></div>
       </div>
-      <aside class="notes">⏱ 10:00 · Ajusta las duraciones a tu calendario real [TUS FECHAS]. La "vuelta" importa: después de competir se sube la comida poco a poco para recuperar la salud hormonal y no rebotar de golpe.</aside>
     </section>
 
     <!-- ===================== SEMANA ===================== -->
@@ -922,7 +910,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
       </div>
       </div>
       <p class="analogy in" style="--d:1.25s">Cada sesión: calentamiento → ejercicios básicos pesados → ejercicios de aislamiento → pasos.</p>
-      <aside class="notes">⏱ 11:00 · Dos formas de organizar la semana: arriba un ejemplo de torso / pierna y abajo tu rutina real. Las barras indican la intensidad [AJUSTA LA DE TU RUTINA]. Explica que cada músculo se entrena unas dos veces por semana y que los días de descanso están planificados, no son "días libres".</aside>
     </section>
 
     <!-- ===================== ENFOQUES ===================== -->
@@ -962,7 +949,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           </div>
         </div>
       </div>
-      <aside class="notes">⏱ 12:00 · Un clic por zona, o toca los círculos de la figura. Cuenta cuál fue tu punto débil y cómo lo trabajaste [TU PUNTO DÉBIL]. En Classic se premia especialmente la cintura estrecha y el vacío abdominal.</aside>
     </section>
 
     <!-- ===================== DESCANSO ===================== -->
@@ -989,7 +975,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <div class="pillar" data-step="3"><b>48–72 h</b><span>antes de volver a castigar el mismo músculo</span></div>
         </div>
       </div>
-      <aside class="notes">⏱ 13:00 · Clic 1: curva dorada (supercompensación: tras entrenar estás peor, descansas y acabas mejor que antes). Clic 2: curva azul, si vuelves a entrenar sin recuperar, cada sesión te hunde más (sobreentrenamiento y lesiones). Clic 3: las tres cifras. Son orientativas.</aside>
     </section>
 
     <!-- ===================== PASOS ===================== -->
@@ -1020,11 +1005,10 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <p style="margin-top:30px">Contar pasos evita que el cuerpo "haga trampas". Y cada paso extra es margen para comer un poco más.</p>
         </div>
       </div>
-      <aside class="notes">⏱ 14:00 · Dato sorprendente: el entrenamiento es una parte pequeña del gasto diario; moverse durante el día pesa más. Pon tu objetivo de pasos real [TUS PASOS, ahora 12.000 de ejemplo]. Porcentajes aproximados.</aside>
     </section>
 
     <!-- ===================== SACIANTES ===================== -->
-    <section class="slide" id="saciantes" data-section="04 · La preparación" data-steps="2" aria-label="Comidas saciantes">
+    <section class="slide" id="saciantes" data-section="04 · La preparación" data-steps="1" aria-label="Comidas saciantes">
       <div class="head">
         <div class="eyebrow in">04 · Pregunta al público</div>
         <h2 class="in" style="--d:.1s">¿Qué llena más con 300 kcal?</h2>
@@ -1035,12 +1019,11 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="plate in" style="--d:.4s"><b>Almendras</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:70;--c1:#7a4e2e;--c2:#b07a4e"></div></div><span class="grams">52 g</span></div>
         <div class="plate in" style="--d:.5s"><b>Aceite de oliva</b><span class="kc">300 kcal</span><div class="disc-box"><div class="disc" style="--s:57;--c1:#7c8a2e;--c2:#c8cf6a"></div></div><span class="grams">34 g</span></div>
       </div>
-      <p class="analogy" data-step="2">En definición mandan los platos grandes y poco calóricos: verdura, fruta, patata, carne magra, claras de huevo…</p>
-      <aside class="notes">⏱ 15:00 · Pregunta al público cuál llena más. Clic 1: aparecen los gramos (las bolas están a escala de peso). 34 g de aceite son unas 3 cucharadas. Clic 2: la regla. Añade tus comidas saciantes favoritas [TUS TRUCOS: gelatina, palomitas, etc.].</aside>
+      <p class="analogy" data-step="1">En definición mandan los platos grandes y poco calóricos: verdura, fruta, patata, carne magra, claras de huevo…</p>
     </section>
 
     <!-- ===================== PREGUNTA DEL AGUA ===================== -->
-    <section class="slide" id="agua" data-section="04 · La preparación" data-steps="3" aria-label="Pregunta al público: el agua">
+    <section class="slide" id="agua" data-section="04 · La preparación" data-steps="1" aria-label="Pregunta al público: el agua">
       <div class="head">
         <div class="eyebrow in">04 · Curiosidad</div>
         <h2 class="in" style="--d:.1s">¿Cuánta agua bebe un culturista al día en su última semana antes de competir?</h2>
@@ -1051,7 +1034,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="opt in" style="--d:.45s"><span class="k">C</span><span class="v">6 litros</span></div>
         <div class="opt correct in" style="--d:.55s"><span class="k">D</span><span class="v">Más de 8</span><span class="tick" aria-hidden="true">✓</span></div>
       </div>
-      <div class="water" data-step="2">
+      <div class="water" data-step="1">
         <div class="liters"><span id="litersNum">0</span><small>L</small></div>
         <div style="display:flex;flex-direction:column;gap:22px">
           <div class="bottles" aria-hidden="true">
@@ -1064,8 +1047,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <p class="muted">Cada botella, 1 litro. Una persona media bebe unos 2 al día.</p>
         </div>
       </div>
-      <p class="teaser" data-step="3">…y el día antes de competir, casi nada. Ahora veréis por qué.</p>
-      <aside class="notes">⏱ 17:00 · Lee la pregunta y deja que el público responda (A, B, C, D). Pulsa → para revelar la respuesta y otra vez para llenar las botellas. Respuesta: en la carga de agua se llegan a beber 8–10 litros al día [CONFIRMA TU CIFRA REAL]. Último clic: el gancho; la explicación llega en la siguiente diapositiva, la peak week.</aside>
+      <p class="teaser" data-step="1">…y el día antes de competir, casi nada. Ahora veréis por qué.</p>
     </section>
 
     <!-- ===================== PEAK WEEK ===================== -->
@@ -1105,7 +1087,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <div class="warn" data-step="4"><b>!</b><p>La ciencia que respalda la manipulación de agua y sal es escasa, y es lo que provoca deshidratación y desmayos en la tarima.</p></div>
         </div>
       </div>
-      <aside class="notes">⏱ 18:00 · Aquí resuelves la pregunta del agua de la diapositiva anterior. Analogía: el cuerpo es un depósito con grifo y desagüe. Si bebes mucho varios días, el cuerpo "abre el desagüe" (las hormonas que retienen agua se relajan). Si de repente cierras el grifo, el desagüe tarda en cerrarse y el depósito baja. Los carbohidratos llenan el músculo. Explica tu protocolo real [TU PEAK WEEK]. Fuente: Escalante et al., 2021: hay muy poca evidencia sobre agua y sodio; la de carbohidratos es algo mejor.</aside>
     </section>
 
     <!-- ===================== DÍA DE COMPETICIÓN ===================== -->
@@ -1122,7 +1103,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="tl-item in" style="--d:0.61s"><span class="y">Tarima</span><b>Comparaciones</b><p>Giros de cuarto y poses obligatorias, al lado de tus rivales.</p></div>
         <div class="tl-item in" style="--d:0.73s"><span class="y">Final</span><b>Rutina libre</b><p>Tu coreografía de poses con música. Aquí se gana al público.</p></div>
       </div>
-      <aside class="notes">⏱ 19:30 · Todos los momentos aparecen a la vez; recórrelos de izquierda a derecha. Cuenta cómo fue tu día en la AECN: a qué hora empezaste, qué comiste, cómo es el backstage [TU DÍA]. Confirma si en la AECN hay rutina libre en tu categoría.</aside>
     </section>
 
     <!-- ===================== NATURAL VS ===================== -->
@@ -1155,7 +1135,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           </ul>
           <figure class="vs-img" style="--pos:50% 40%"><img src="fotos/vs-jeringuilla.jpg" alt="Jeringuilla con aguja"></figure>
         </div>
-      </div>      <aside class="notes">⏱ 20:30 · Explica cómo son los controles en la AECN [CONFIRMA: análisis de orina, polígrafo, etc.]. Deja claro que no juzgas, solo explicas: a continuación verás las categorías del culturismo profesional y, al final, sus riesgos.</aside>
+      </div>
     </section>
 
     <!-- ===================== 05 · CATEGORÍAS ===================== -->
@@ -1199,7 +1179,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         </div>
       </div>
       <p class="src" id="catCredit"></p>
-      <aside class="notes">⏱ 21:30 · Cada clic pasa a la siguiente categoría (primero hombres, luego mujeres); también puedes tocar los círculos o las pestañas. El tamaño del círculo indica cuánto músculo se busca. Cada categoría muestra a su referente más conocido con su foto. Tras Ms. Olympia, un clic más muestra los efectos de los anabolizantes en mujeres con una foto de Iris Kyle entrenando: habla de los efectos en general, sin atribuir su uso a ninguna atleta concreta. Datos extra por si te preguntan: en 212 el récord es de Flex Lewis (7 títulos, 2012–2018) y Ángel Calderón se perdió el Olympia 2025 por una lesión de tríceps; en Open el récord es de 8 títulos (Lee Haney y Ronnie Coleman) y Nick Walker ganó en 2026 por delante de Samson Dauda y Derek Lunsford; Men's Physique llegó al Olympia en 2013; Wellness en 2021; Bikini suele ser la categoría con más participantes; Figure se juzga con giros de cuarto, sin poses de fuerza; Women's Physique posa parecido al culturismo masculino. Las federaciones naturales como la AECN tienen categorías parecidas. Cierra con: "de todas ellas, la mía es Classic; os enseño cómo se posa".</aside>
     </section>
 
     <!-- ===================== POSES DE CLASSIC ===================== -->
@@ -1215,7 +1194,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="pose in" style="--d:.44s"><figure class="ph"><img src="fotos/pose-4.png" alt="Abdominales y pierna" onerror="this.remove()"><figcaption><b>Foto</b>pose-4.png</figcaption></figure><b>Abdominales y pierna</b></div>
         <div class="pose in" style="--d:.52s"><figure class="ph"><img src="fotos/pose-5.png" alt="Most muscular" onerror="this.remove()"><figcaption><b>Foto</b>pose-5.png</figcaption></figure><b>Most muscular</b></div>
       </div>
-      <aside class="notes">⏱ 23:30 · Las cinco poses aparecen a la vez. Si te atreves, haz alguna en directo: funciona muy bien. Comprueba que las poses coinciden con las de AECN Men's Classic [CONFIRMA]. Cuenta que mantener una pose en tensión cansa muchísimo y se ensaya a diario. Enlaza con tu caso: "y así me fue a mí".</aside>
     </section>
 
     <!-- ===================== 06 · MI CAMINO ===================== -->
@@ -1229,7 +1207,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <figure class="ph in" style="--d:.3s"><img src="fotos/adri-2016.jpg" alt="Adrián con un amigo en 2016" style="object-position:50% 22%" onerror="this.remove()"><figcaption><b>Foto</b>adri-2016.jpg</figcaption></figure>
         <figure class="ph in" style="--d:.4s"><img src="fotos/adri-2016-futbol.png" alt="Adrián con su equipo de fútbol en 2016" style="object-position:50% 0%" onerror="this.remove()"><figcaption><b>Foto</b>adri-2016-futbol.png</figcaption></figure>
       </div>
-      <aside class="notes">⏱ 24:30 · Tu historia en primera persona. Qué te llevó a competir, qué cambió entre 2023 y 2025 [TU HISTORIA].</aside>
     </section>
 
     <!-- ===================== ANTES / DESPUÉS ===================== -->
@@ -1252,7 +1229,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
           <div class="kg-steps in" style="--d:1.3s"><b>12.000–15.000</b><span>pasos al día durante esas 20 semanas</span></div>
         </div>
       </div>
-      <aside class="notes">⏱ 25:30 · Izquierda: 2016, con 19 años y 72 kg. Derecha: hoy, en most muscular. Volumen hasta 95 kg (+23) y luego 20 semanas de definición hasta 78 kg en tarima (−17), con 12.000–15.000 pasos al día. Si quieres, conecta con la calculadora de definición del bloque 3: "¿os acordáis de la calculadora? Esto es lo que salió en mi caso".</aside>
     </section>
 
     <!-- ===================== 07 · CURIOSIDADES ===================== -->
@@ -1269,50 +1245,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <button type="button" class="flip in" style="--d:.43s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>La báscula de cocina, siempre en la mochila</b></div><div class="face back"><p>En preparación se pesa casi todo lo que se come, al gramo. Comer fuera se convierte en un reto.</p></div></div></button>
         <button type="button" class="flip in" style="--d:.5s"><div class="flip-in"><div class="face front"><span class="q">Toca para descubrir</span><b>El día de tarima no es tu día más sano</b></div><div class="face back"><p>Grasa mínima, poca agua y muchas semanas de hambre: el físico de competición dura unos días y no se puede mantener.</p></div></div></button>
       </div>
-      <aside class="notes">⏱ 26:30 · Cada clic gira una tarjeta (o tócalas en el orden que quieras). Antes de girar, pregunta al público "¿por qué creéis?". La última enlaza con los riesgos.</aside>
-    </section>
-
-    <!-- ===================== RIESGOS ===================== -->
-    <section class="slide" id="riesgos" data-section="07 · Curiosidades y riesgos" data-steps="1" aria-label="Riesgos">
-      <div class="head">
-        <div class="eyebrow in">07 · Riesgos</div>
-        <h2 class="in" style="--d:.1s">El precio de llevarlo al extremo</h2>
-      </div>
-      <div class="risk fill">
-        <div class="card in" style="--d:.2s"><h3 class="bronze">Fármacos</h3>
-          <ul><li>Esteroides anabolizantes: corazón agrandado, tensión alta, problemas hormonales y de fertilidad.</li><li>Hormona del crecimiento e insulina: riesgo metabólico y de hipoglucemia.</li><li>Diuréticos: deshidratación y alteración de las sales del cuerpo.</li></ul></div>
-        <div class="card in" style="--d:.3s"><h3 class="water-c">En la tarima</h3>
-          <ul><li>Deshidratación severa por cortar agua y usar diuréticos.</li><li>Bajadas de tensión, calambres y desmayos en pleno escenario.</li><li>Un estudio con atletas de físico encontró deshidratación significativa o severa el día de competir.</li></ul></div>
-      </div>
-      <div class="memorial" data-step="1">
-        <span class="lbl">Casos<br>conocidos</span>
-        <div><b>M. Benaziza · 1992</b><span>Murió tras competir; se atribuye a los diuréticos.</span></div>
-        <div><b>A. Münzer · 1996</b><span>Fallo multiorgánico a los 31 años.</span></div>
-        <div><b>S. Rhoden · 2021</b><span>Mr. Olympia 2018; infarto a los 46 años.</span></div>
-      </div>
-      <aside class="notes">⏱ 27:30 · Tono serio, sin morbo. Clic para mostrar los casos. Münzer: la autopsia habló de fallo multiorgánico y se encontraron restos de unas 20 sustancias. Recalca que en el culturismo natural estos riesgos son mucho menores, pero la deshidratación de la peak week afecta a todos.</aside>
-    </section>
-
-    <!-- ===================== CORAZÓN ===================== -->
-    <section class="slide" id="corazon" data-section="07 · Curiosidades y riesgos" data-steps="1" aria-label="El corazón de un culturista">
-      <div class="head">
-        <div class="eyebrow in">07 · Órganos</div>
-        <h2 class="in" style="--d:.1s">El corazón de un culturista</h2>
-      </div>
-      <div class="heart-wrap">
-        <div class="hcol in" style="--d:.2s">
-          <svg viewBox="-130 -110 260 190" aria-hidden="true"><path class="heart" d="M0 70 C-100 10 -125 -55 -70 -88 C-38 -106 -10 -88 0 -62 C10 -88 38 -106 70 -88 C125 -55 100 10 0 70 Z" fill="#a8998a"/></svg>
-          <b>332 g</b><span>Hombre de referencia</span>
-        </div>
-        <div class="hcol in" style="--d:.3s">
-          <svg viewBox="-130 -110 260 190" aria-hidden="true"><path class="heart big" d="M0 70 C-100 10 -125 -55 -70 -88 C-38 -106 -10 -88 0 -62 C10 -88 38 -106 70 -88 C125 -55 100 10 0 70 Z" fill="#b2603f"/></svg>
-          <b class="bronze">575 g</b><span>Media en autopsias<br>de culturistas</span>
-        </div>
-        <div class="heart-facts">
-          <div class="card in" style="--d:.4s"><h3 class="gold">+74 %</h3><p>más pesado de media. En todos los casos revisados, la pared del ventrículo izquierdo estaba engrosada.</p></div>
-          <div class="card in" style="--d:.5s"><h3>Más grande no es mejor</h3><p>Una pared más gruesa se vuelve rígida y bombea peor. Influyen los esteroides, la tensión alta y el propio peso corporal.</p></div>
-        </div>
-      </div>      <aside class="notes">⏱ 28:30 · Clic: el corazón crece hasta su tamaño proporcional. Son autopsias de culturistas fallecidos (muchos con esteroides: dos de cada tres casos), no de todos los culturistas. Un corazón normal de deportista también crece algo, pero de forma sana.</aside>
     </section>
 
     <!-- ===================== CIERRE ===================== -->
@@ -1331,7 +1263,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
         <div class="who in" style="--d:1.4s"><b>Adrián Casas Cuartero</b><a class="ig" href="https://www.instagram.com/adri_casas_97/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.1" class="dot"/></svg>@adri_casas_97</a></div>
         <div class="badges in" style="--d:1.6s"><span class="badge win">Men's Classic · AECN 2025</span></div>
       </div>
-      <aside class="notes">⏱ 30:00 · Cierre y turno de preguntas. Si sobra tiempo: quiz corto (pendiente de preparar).</aside>
     </section>
 
   </div>
@@ -1344,14 +1275,9 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
     <button type="button" id="bPrev" aria-label="Anterior">←</button>
     <span class="count" id="hudCount"></span>
     <button type="button" id="bNext" aria-label="Siguiente">→</button>
-    <button type="button" id="bNotes" aria-label="Notas del orador">Notas</button>
     <button type="button" id="bFull" aria-label="Pantalla completa">⛶</button>
     <button type="button" id="bHelp" aria-label="Atajos de teclado">?</button>
   </div>
-</div>
-<div class="notes-panel" id="notesPanel" hidden>
-  <header><span>Notas del orador</span><span id="timer">00:00</span></header>
-  <div id="notesText"></div>
 </div>
 <div class="help" id="help" hidden>
   <div>
@@ -1359,7 +1285,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
     <kbd>→</kbd> <kbd>Espacio</kbd> <kbd>AvPág</kbd> siguiente<br>
     <kbd>←</kbd> <kbd>RePág</kbd> anterior<br>
     <kbd>Clic izq.</kbd> siguiente · <kbd>Clic der.</kbd> anterior<br>
-    <kbd>F</kbd> pantalla completa · <kbd>N</kbd> notas<br>
+    <kbd>F</kbd> pantalla completa<br>
     <kbd>B</kbd> pantalla en negro · <kbd>Inicio</kbd> / <kbd>Fin</kbd><br>
     <span class="muted">Funciona con mandos de presentación. Pulsa cualquier tecla para cerrar.</span>
   </div>
@@ -1371,7 +1297,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   const $ = s => document.querySelector(s);
   const deck = $('#deck');
   const slides = [...deck.querySelectorAll('.slide')];
-  let cur = -1, step = 0, t0 = null;
+  let cur = -1, step = 0;
   const fmt = n => n.toLocaleString('es-ES');
   const dec = (n, d = 1) => n.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
 
@@ -1399,7 +1325,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   const hooks = {
     agua(s) {
       const el = $('#litersNum');
-      if (s < 2) { cancelAnimationFrame(rafs.litersNum); el.textContent = '0'; return; }
+      if (s < 1) { cancelAnimationFrame(rafs.litersNum); el.textContent = '0'; return; }
       if (el.textContent !== '10') countTo(el, 10, 2000, String);
     },
     pasos(s, el, entered) { if (entered) countTo($('#pasosNum'), 12000, 2200); },
@@ -1447,25 +1373,19 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
     setStep(s === 'end' ? maxStep(slides[i]) : s, entered);
   }
   const next = () => {
-    if (t0 === null) t0 = Date.now();
     step < maxStep(slides[cur]) ? setStep(step + 1) : (cur < slides.length - 1 && go(cur + 1));
   };
   const prev = () => step > 0 ? setStep(step - 1) : (cur > 0 && go(cur - 1, 'end'));
 
-  /* ---- HUD, notas y temporizador ---- */
+  /* ---- HUD ---- */
   function hud() {
     const el = slides[cur];
     $('#hudSec').textContent = el.dataset.section || '';
     $('#hudCount').textContent = (cur + 1) + ' / ' + slides.length;
     const maxS = maxStep(el);
     const frac = (cur + (maxS ? step / (maxS + 1) : 0)) / Math.max(1, slides.length - 1);
-    $('#progress').style.transform = 'scaleX(' + Math.min(1, frac) + ')';    $('#notesText').textContent = el.querySelector('.notes')?.textContent.trim() || 'Sin notas.';
+    $('#progress').style.transform = 'scaleX(' + Math.min(1, frac) + ')';
   }
-  setInterval(() => {
-    if (t0 === null) return;
-    const s = Math.floor((Date.now() - t0) / 1000);
-    $('#timer').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-  }, 1000);
 
   const hudEl = $('#hud'); let hideT;
   addEventListener('mousemove', () => { hudEl.classList.add('show'); clearTimeout(hideT); hideT = setTimeout(() => hudEl.classList.remove('show'), 2500); });
@@ -1479,7 +1399,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   const toggle = id => { const el = $(id); el.hidden = !el.hidden; };
   $('#bPrev').onclick = prev;
   $('#bNext').onclick = next;
-  $('#bNotes').onclick = () => toggle('#notesPanel');
   $('#bFull').onclick = toggleFull;
   $('#bHelp').onclick = () => toggle('#help');
 
@@ -1494,7 +1413,6 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
       case 'Home': go(0); break;
       case 'End': go(slides.length - 1, 'end'); break;
       case 'f': case 'F': toggleFull(); break;
-      case 'n': case 'N': toggle('#notesPanel'); break;
       case 'b': case 'B': case '.': toggle('#blackout'); break;
       case '?': toggle('#help'); break;
       case 'Escape': if (inField) e.target.blur(); break;
@@ -1502,7 +1420,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   });
 
   /* clic izquierdo = siguiente, clic derecho = anterior (salvo en zonas clicables) */
-  const clickable = 'a, button, input, select, textarea, label, .flip, .hot, .chip, .mk, .hud, .notes-panel, .ctl, .presets';
+  const clickable = 'a, button, input, select, textarea, label, .flip, .hot, .chip, .mk, .hud, .ctl, .presets';
   addEventListener('click', e => {
     if (e.button !== 0) return;
     if (!$('#help').hidden) { $('#help').hidden = true; return; }
