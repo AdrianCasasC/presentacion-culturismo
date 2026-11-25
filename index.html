@@ -578,6 +578,15 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
 .vid-frame{position:relative;width:1020px;aspect-ratio:16/9;margin:0;border-radius:22px;overflow:hidden;
   border:2px solid var(--line);background:#000;box-shadow:0 30px 80px rgba(0,0,0,.55)}
 .vid-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.vid-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:#000;cursor:pointer;display:block;overflow:hidden}
+.vid-play img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;transition:transform .6s var(--ease),opacity .4s}
+.vid-play:hover img,.vid-play:focus-visible img{transform:scale(1.03);opacity:1}
+.vid-btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;display:grid;place-items:center}
+.vid-btn svg{width:150px;height:auto;filter:drop-shadow(0 10px 28px rgba(0,0,0,.6))}
+.vid-btn .yt-bg{fill:#212121;opacity:.82;transition:fill .3s,opacity .3s}
+.vid-btn .yt-ar{fill:#fff}
+.vid-play:hover .yt-bg,.vid-play:focus-visible .yt-bg{fill:#f00;opacity:1}
+.vid-play:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
 .vid-side{display:flex;flex-direction:column;align-items:flex-start;gap:34px}
 .vid-side p{font-size:32px;line-height:1.45;color:var(--muted);margin:0}
 .vid-title{font-family:var(--f-display);font-weight:800;font-size:54px;line-height:1;text-transform:uppercase;color:var(--chalk)!important}
@@ -1269,10 +1278,10 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
       </div>
       <div class="vid fill">
         <figure class="vid-frame in" style="--d:.2s">
-          <iframe src="https://www.youtube-nocookie.com/embed/WPhVSSGvi0A?start=654&amp;rel=0"
-                  title="Vídeo de la competición de Adrián Casas"
-                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <button type="button" class="vid-play" aria-label="Reproducir el vídeo de la competición desde el minuto 10:54">
+            <img src="fotos/video-competicion.jpg" alt="Fotograma del Trofeo Ciudad de Salamanca AECN 2025" onerror="this.remove()">
+            <span class="vid-btn" aria-hidden="true"><svg viewBox="0 0 68 48"><path class="yt-bg" d="M66.5 7.5a8.6 8.6 0 0 0-6-6C55.2 0 34 0 34 0S12.8 0 7.5 1.5a8.6 8.6 0 0 0-6 6C0 12.8 0 24 0 24s0 11.2 1.5 16.5a8.6 8.6 0 0 0 6 6C12.8 48 34 48 34 48s21.2 0 26.5-1.5a8.6 8.6 0 0 0 6-6C68 35.2 68 24 68 24s0-11.2-1.5-16.5z"/><path class="yt-ar" d="M27 34V14l18 10z"/></svg></span>
+          </button>
         </figure>
         <div class="vid-side">
           <span class="badge win in" style="--d:.3s">Men's Classic · AECN 2025</span>
@@ -1397,6 +1406,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   function go(i, s = 0) {
     i = Math.max(0, Math.min(slides.length - 1, i));
     const entered = i !== cur;
+    if (entered && slides[cur]?.id === 'video') resetVideo();
     if (entered) {
       slides.forEach((el, j) => {
         el.classList.toggle('active', j === i);
@@ -1628,6 +1638,27 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
 
   /* ---- antes / después ---- */
   $('#cmp')?.addEventListener('input', e => $('#compare').style.setProperty('--x', e.target.value + '%'));
+
+  /* ---- vídeo: la portada local solo carga YouTube al pulsarla, y se descarga al salir ---- */
+  const vidFrame = $('#video .vid-frame');
+  const vidFacade = vidFrame ? vidFrame.innerHTML : '';
+  function bindVideo() {
+    vidFrame?.querySelector('.vid-play')?.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/WPhVSSGvi0A?start=654&rel=0&autoplay=1';
+      f.title = 'Vídeo de la competición de Adrián Casas';
+      f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; web-share');
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      f.allowFullscreen = true;
+      vidFrame.replaceChildren(f);
+    });
+  }
+  function resetVideo() {
+    if (!vidFrame || vidFrame.querySelector('.vid-play')) return;
+    vidFrame.innerHTML = vidFacade;
+    bindVideo();
+  }
+  bindVideo();
 
   /* ---- arranque ---- */
   const fromHash = () => { const m = /^#s(\d+)$/.exec(location.hash); return m ? +m[1] - 1 : 0; };
