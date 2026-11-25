@@ -573,6 +573,20 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
 .legend b{font-family:var(--f-display);font-weight:800;font-size:48px;text-transform:uppercase;line-height:1}
 .legend p{font-size:25px;color:var(--muted);line-height:1.4}
 
+/* ---------- Vídeo de la competición ---------- */
+.vid{display:grid;grid-template-columns:1020px 1fr;gap:70px;align-items:center}
+.vid-frame{position:relative;width:1020px;aspect-ratio:16/9;margin:0;border-radius:22px;overflow:hidden;
+  border:2px solid var(--line);background:#000;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.vid-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.vid-side{display:flex;flex-direction:column;align-items:flex-start;gap:34px}
+.vid-side p{font-size:32px;line-height:1.45;color:var(--muted);margin:0}
+.vid-title{font-family:var(--f-display);font-weight:800;font-size:54px;line-height:1;text-transform:uppercase;color:var(--chalk)!important}
+.vid-credit{font-family:var(--f-mono);font-size:21px;color:var(--muted);opacity:.75}
+.vid-link{font-family:var(--f-mono);font-size:23px;color:var(--bronze);text-decoration:none;
+  word-break:break-all;border-bottom:1px solid var(--line);padding-bottom:8px;transition:color .3s,border-color .3s}
+.vid-link:hover{color:var(--gold);border-color:var(--bronze)}
+.vid-link:focus-visible{outline:3px solid var(--gold);outline-offset:6px;border-radius:8px}
+
 /* ---------- Cierre ---------- */
 #cierre .title{font-size:320px}
 .close-mid{display:flex;flex-direction:column;align-items:center;gap:30px;position:relative}
@@ -1247,6 +1261,29 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
       </div>
     </section>
 
+    <!-- ===================== VÍDEO DE LA COMPETICIÓN ===================== -->
+    <section class="slide" id="video" data-section="Cierre" aria-label="Vídeo de mi competición">
+      <div class="head">
+        <div class="eyebrow in">Mi competición, en vídeo</div>
+        <h2 class="in" style="--d:.1s">Así se ve desde la tarima</h2>
+      </div>
+      <div class="vid fill">
+        <figure class="vid-frame in" style="--d:.2s">
+          <iframe src="https://www.youtube-nocookie.com/embed/WPhVSSGvi0A?start=654&amp;rel=0"
+                  title="Vídeo de la competición de Adrián Casas"
+                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </figure>
+        <div class="vid-side">
+          <span class="badge win in" style="--d:.3s">Men's Classic · AECN 2025</span>
+          <p class="vid-title in" style="--d:.4s">Trofeo Ciudad de Salamanca</p>
+          <p class="in" style="--d:.5s">Empieza en el <b class="gold">10:54</b>, justo en mi pase sobre la tarima.</p>
+          <a class="vid-link in" style="--d:.6s" href="https://www.youtube.com/watch?v=WPhVSSGvi0A&amp;t=654s" target="_blank" rel="noopener">youtube.com/watch?v=WPhVSSGvi0A&amp;t=654s</a>
+          <span class="vid-credit in" style="--d:.7s">Grabación del canal @culturismoweb</span>
+        </div>
+      </div>
+    </section>
+
     <!-- ===================== CIERRE ===================== -->
     <section class="slide" id="cierre" data-section="Cierre" aria-label="Gracias">
       <div class="beam l" aria-hidden="true"></div>
@@ -1420,7 +1457,7 @@ input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--gold)}
   });
 
   /* clic izquierdo = siguiente, clic derecho = anterior (salvo en zonas clicables) */
-  const clickable = 'a, button, input, select, textarea, label, .flip, .hot, .chip, .mk, .hud, .ctl, .presets';
+  const clickable = 'a, button, .vid-frame, input, select, textarea, label, .flip, .hot, .chip, .mk, .hud, .ctl, .presets';
   addEventListener('click', e => {
     if (e.button !== 0) return;
     if (!$('#help').hidden) { $('#help').hidden = true; return; }
